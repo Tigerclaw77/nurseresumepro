@@ -11,7 +11,10 @@ import { aiFormalizeList } from "./lib/aiFormalize.js";
 
 // prompt builders
 import { buildCoverMessages, parseCoverJson } from "./prompts/cover.js";
-import { buildRewriteMessages, parseRewriteResponse } from "./prompts/rewrite.js";
+import {
+  buildRewriteMessages,
+  parseRewriteResponse,
+} from "./prompts/rewrite.js";
 import { buildResumeMessages, parseResumeJson } from "./prompts/resume.js";
 
 // layout helpers (kept for backward compatibility/fallback)
@@ -59,11 +62,14 @@ const SUPA_RPC = SUPABASE_URL ? `${SUPABASE_URL}/rest/v1/rpc/log_lead` : "";
 /* ------------------------------ Small utils ------------------------------ */
 const strip = (s = "") => String(s || "").trim();
 const normalize = (t = "") =>
-  String(t || "").replace(/[^\w@.]+/g, "").toLowerCase();
+  String(t || "")
+    .replace(/[^\w@.]+/g, "")
+    .toLowerCase();
 
 function formatPhoneNumber(raw = "") {
   const d = String(raw).replace(/\D/g, "");
-  if (d.length === 10) return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
+  if (d.length === 10)
+    return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
   return raw;
 }
 
@@ -107,7 +113,9 @@ let coverTpl = fs.existsSync(COVER_TEMPLATE_PATH)
 
 // minimal placeholder engine supporting {{key}} and {{#if key}}...{{/if}}
 function applyIfBlocks(tpl, data) {
-  return tpl.replace(/{{#if\s+(\w+)}}([\s\S]*?){{\/if}}/g, (_, k, inner) => (data[k] ? inner : ""));
+  return tpl.replace(/{{#if\s+(\w+)}}([\s\S]*?){{\/if}}/g, (_, k, inner) =>
+    data[k] ? inner : ""
+  );
 }
 function renderPlaceholders(tpl, data) {
   const withIf = applyIfBlocks(tpl, data);
@@ -162,16 +170,58 @@ function convertBulletsToHtml(text = "") {
 
 /* ----------------------------- ATS scoring ------------------------------ */
 const ACTION_VERBS = [
-  "Led","Managed","Developed","Created","Delivered","Assisted","Collaborated","Supported","Trained","Performed",
-  "Implemented","Built","Designed","Resolved","Launched","Achieved","Increased","Decreased","Optimized",
-  "Streamlined","Facilitated","Presented","Organized","Monitored","Analyzed","Recommended","Improved","Communicated",
-  "Prepared","Evaluated","Planned","Negotiated","Operated","Maintained","Initiated","Directed","Documented","Tested",
-  "Inspected","Supervised","Configured","Updated","Reviewed",
+  "Led",
+  "Managed",
+  "Developed",
+  "Created",
+  "Delivered",
+  "Assisted",
+  "Collaborated",
+  "Supported",
+  "Trained",
+  "Performed",
+  "Implemented",
+  "Built",
+  "Designed",
+  "Resolved",
+  "Launched",
+  "Achieved",
+  "Increased",
+  "Decreased",
+  "Optimized",
+  "Streamlined",
+  "Facilitated",
+  "Presented",
+  "Organized",
+  "Monitored",
+  "Analyzed",
+  "Recommended",
+  "Improved",
+  "Communicated",
+  "Prepared",
+  "Evaluated",
+  "Planned",
+  "Negotiated",
+  "Operated",
+  "Maintained",
+  "Initiated",
+  "Directed",
+  "Documented",
+  "Tested",
+  "Inspected",
+  "Supervised",
+  "Configured",
+  "Updated",
+  "Reviewed",
 ];
-const startsWithActionVerb = (t = "") => ACTION_VERBS.some((v) => t.trim().startsWith(v));
+const startsWithActionVerb = (t = "") =>
+  ACTION_VERBS.some((v) => t.trim().startsWith(v));
 
 function calculateAtsScore(bulletsArr, sectionFlags, dates) {
-  const verbCount = bulletsArr.reduce((n, b) => n + (startsWithActionVerb(b) ? 1 : 0), 0);
+  const verbCount = bulletsArr.reduce(
+    (n, b) => n + (startsWithActionVerb(b) ? 1 : 0),
+    0
+  );
   const total = bulletsArr.length || 1;
   const actionScore = Math.round((verbCount / total) * 30);
 
@@ -180,10 +230,12 @@ function calculateAtsScore(bulletsArr, sectionFlags, dates) {
     10 * !!sectionFlags.certifications +
     10 * !!sectionFlags.education +
     10 * !!sectionFlags.experience +
-    5  * !!sectionFlags.summary +
-    2  * !!sectionFlags.hobbies;
+    5 * !!sectionFlags.summary +
+    2 * !!sectionFlags.hobbies;
 
-  const dateScore = dates.every((d) => /\b[A-Za-z]+,\s+\d{4}\b/.test(d)) ? 5 : 0; // Month, YYYY
+  const dateScore = dates.every((d) => /\b[A-Za-z]+,\s+\d{4}\b/.test(d))
+    ? 5
+    : 0; // Month, YYYY
   const lengthScore = bulletsArr.length >= 4 ? 5 : 0;
 
   return Math.min(actionScore + sectionScore + dateScore + lengthScore, 100);
@@ -191,7 +243,10 @@ function calculateAtsScore(bulletsArr, sectionFlags, dates) {
 
 /* ---------------------------- Sanitizers/HTML ---------------------------- */
 function stripCodeFences(s = "") {
-  return String(s).replace(/^```(?:\s*html)?\s*/i, "").replace(/```$/i, "").trim();
+  return String(s)
+    .replace(/^```(?:\s*html)?\s*/i, "")
+    .replace(/```$/i, "")
+    .trim();
 }
 function stripOuterWrappers(s = "") {
   return String(s)
@@ -212,7 +267,11 @@ function coerceToCleanHtml(raw = "", type = "resume") {
   if (!hasTag) return convertBulletsToHtml(s);
   s = sanitizeAllowedTags(s);
   if (!/<div[^>]*>/.test(s)) s = `<div>${s}</div>`;
-  if (!/class="/.test(s)) s = s.replace(/<div/, `<div class="${type === "cover" ? "cover" : "resume"}"`);
+  if (!/class="/.test(s))
+    s = s.replace(
+      /<div/,
+      `<div class="${type === "cover" ? "cover" : "resume"}"`
+    );
   s = s.replace(/<p>\s*(?:name|contact)\s*:[\s\S]*?<\/p>/gi, "");
   return s.trim();
 }
@@ -220,7 +279,10 @@ function coerceToCleanHtml(raw = "", type = "resume") {
 /* --------------------------- Rate limiting (IP) -------------------------- */
 const rateMap = new Map();
 function getClientIp(req) {
-  const xf = (req.headers["x-forwarded-for"] || "").toString().split(",")[0].trim();
+  const xf = (req.headers["x-forwarded-for"] || "")
+    .toString()
+    .split(",")[0]
+    .trim();
   return xf || req.socket.remoteAddress || "unknown";
 }
 function hasExceededLimit(ip, action, limit = 3, windowMs = 60 * 60 * 1000) {
@@ -238,7 +300,9 @@ function hasExceededLimit(ip, action, limit = 3, windowMs = 60 * 60 * 1000) {
 
 /* ------------------------ Number hallucination guard --------------------- */
 const numberTokens = (s = "") =>
-  Array.from(String(s).matchAll(/\d[\d,]*\.?\d*(?:%|k|K|M|m)?/g)).map((m) => m[0]);
+  Array.from(String(s).matchAll(/\d[\d,]*\.?\d*(?:%|k|K|M|m)?/g)).map(
+    (m) => m[0]
+  );
 const normalizeNum = (t = "") => t.replace(/[^\d.]/g, "");
 
 const normalizeYear4 = (y) => {
@@ -263,7 +327,9 @@ const SIGNOFF_MAP = {
   appreciative: "With appreciation",
 };
 function resolveSignoff(fd = {}, options = {}) {
-  const raw = String(options.signoff || fd.signoff || fd.signoffTone || "").trim();
+  const raw = String(
+    options.signoff || fd.signoff || fd.signoffTone || ""
+  ).trim();
   if (!raw) return "Sincerely";
   const key = raw.toLowerCase();
   if (SIGNOFF_MAP[key]) return SIGNOFF_MAP[key];
@@ -286,14 +352,20 @@ function truncateIp(ip = "") {
 
 /* -------------------------------- Health --------------------------------- */
 app.get("/api/health", (_req, res) => {
-  res.json({ ok: true, openai: Boolean(openai), supabaseRpc: Boolean(SUPA_RPC) });
+  res.json({
+    ok: true,
+    openai: Boolean(openai),
+    supabaseRpc: Boolean(SUPA_RPC),
+  });
 });
 
 /* --------------------------- Supabase: /api/lead -------------------------- */
 app.post("/api/lead", async (req, res) => {
   try {
     if (!SUPA_RPC || !SUPABASE_SERVICE_KEY) {
-      return res.status(500).json({ ok: false, error: "supabase_not_configured" });
+      return res
+        .status(500)
+        .json({ ok: false, error: "supabase_not_configured" });
     }
     const h = req.headers["x-forwarded-for"] || req.socket.remoteAddress || "";
     const payload = req.body || {};
@@ -306,9 +378,12 @@ app.post("/api/lead", async (req, res) => {
       p_state: payload.state || "",
       p_zip: payload.zip || "",
       p_product_type: payload.product_type || "resume", // "resume" | "cover"
-      p_ats_score: typeof payload.ats_score === "number" ? payload.ats_score : null,
-      p_consent_scopes: Array.isArray(payload.consent_scopes) && payload.consent_scopes.length
-        ? payload.consent_scopes : ["service"],
+      p_ats_score:
+        typeof payload.ats_score === "number" ? payload.ats_score : null,
+      p_consent_scopes:
+        Array.isArray(payload.consent_scopes) && payload.consent_scopes.length
+          ? payload.consent_scopes
+          : ["service"],
       p_consent_version: payload.consent_version || "pp-v1.0",
       p_gpc: !!payload.gpc,
       p_utm: payload.utm || {},
@@ -330,7 +405,14 @@ app.post("/api/lead", async (req, res) => {
 
     if (!r.ok) {
       const t = await r.text().catch(() => "");
-      return res.status(502).json({ ok: false, error: "lead_write_failed", status: r.status, detail: t.slice(0, 200) });
+      return res
+        .status(502)
+        .json({
+          ok: false,
+          error: "lead_write_failed",
+          status: r.status,
+          detail: t.slice(0, 200),
+        });
     }
 
     const uuid = await r.json();
@@ -345,11 +427,15 @@ app.post("/api/generate/", async (req, res) => {
   try {
     const ip = getClientIp(req);
     if (hasExceededLimit(ip, "generate", 3)) {
-      return res.status(429).json({ output: "", error: "Generation limit reached." });
+      return res
+        .status(429)
+        .json({ output: "", error: "Generation limit reached." });
     }
 
     const body = req.body || {};
-    const type = String(body.type || "").trim().toLowerCase();
+    const type = String(body.type || "")
+      .trim()
+      .toLowerCase();
 
     if (type === "cover") return handleCover(body, res);
     if (type === "resume") return handleResume(body, res);
@@ -357,7 +443,9 @@ app.post("/api/generate/", async (req, res) => {
     return res.status(400).json({ error: "Invalid type" });
   } catch (e) {
     console.error(e);
-    return res.status(500).json({ output: "", error: e?.message || "Server error" });
+    return res
+      .status(500)
+      .json({ output: "", error: e?.message || "Server error" });
   }
 });
 
@@ -365,9 +453,15 @@ app.post("/api/generate/", async (req, res) => {
 app.post("/api/export/docx", async (req, res) => {
   try {
     const { html, type = "resume", paid, token } = req.body || {};
-    const isPaid = Boolean(paid) || (typeof token === "string" && token.length > 10);
+    const isPaid =
+      Boolean(paid) || (typeof token === "string" && token.length > 10);
     if (!isPaid) {
-      return res.status(402).json({ error: "PAYMENT_REQUIRED", message: "Please complete checkout to export." });
+      return res
+        .status(402)
+        .json({
+          error: "PAYMENT_REQUIRED",
+          message: "Please complete checkout to export.",
+        });
     }
     if (!html || typeof html !== "string") {
       return res.status(400).json({ error: "INVALID_HTML" });
@@ -377,7 +471,10 @@ app.post("/api/export/docx", async (req, res) => {
       margins: { top: 720, right: 720, bottom: 720, left: 720 },
     });
     const filename = type === "cover" ? "cover-letter.docx" : "resume.docx";
-    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    );
     res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
     return res.send(Buffer.from(buffer));
   } catch (err) {
@@ -391,43 +488,77 @@ async function handleCover(data, res) {
   const form = data || {};
   const fd = form.formData || form;
 
-  const fullName = [strip(fd.firstName), strip(fd.lastName)].filter(Boolean).join(" ") || "Your Name";
+  const fullName =
+    [strip(fd.firstName), strip(fd.lastName)].filter(Boolean).join(" ") ||
+    "Your Name";
   const email = strip(fd.email);
   const phoneDigits = String(fd.phone || "").replace(/\D/g, "");
   const phone =
-    phoneDigits.length === 10 ? `(${phoneDigits.slice(0, 3)}) ${phoneDigits.slice(3, 6)}-${phoneDigits.slice(6)}` : strip(fd.phone);
-  const addressLine = strip(fd.address2) ? `${strip(fd.address)}, ${strip(fd.address2)}` : strip(fd.address);
-  const cityStateZip = [strip(fd.city), strip(fd.state), strip(fd.zip)].filter(Boolean).join(", ");
+    phoneDigits.length === 10
+      ? `(${phoneDigits.slice(0, 3)}) ${phoneDigits.slice(
+          3,
+          6
+        )}-${phoneDigits.slice(6)}`
+      : strip(fd.phone);
+  const addressLine = strip(fd.address2)
+    ? `${strip(fd.address)}, ${strip(fd.address2)}`
+    : strip(fd.address);
+  const cityStateZip = [strip(fd.city), strip(fd.state), strip(fd.zip)]
+    .filter(Boolean)
+    .join(", ");
 
-  const recipient = strip(fd.recipient) || strip(fd.recipientName) || strip(fd.hiringManager) || strip(fd.contactName);
+  const recipient =
+    strip(fd.recipient) ||
+    strip(fd.recipientName) ||
+    strip(fd.hiringManager) ||
+    strip(fd.contactName);
   const company = strip(fd.companyName);
   const role = strip(fd.job_title);
 
   const companyCity = strip(fd.company_city);
   const companyState = strip(fd.company_state);
-  const COMPANY_LOCATION = [companyCity, companyState].filter(Boolean).join(", ");
+  const COMPANY_LOCATION = [companyCity, companyState]
+    .filter(Boolean)
+    .join(", ");
 
   const SIGNOFF = resolveSignoff(fd, form.options || {});
-  const SALUTATION_TEXT = recipient ? `Dear ${recipient},` : "Dear Hiring Manager,";
+  const SALUTATION_TEXT = recipient
+    ? `Dear ${recipient},`
+    : "Dear Hiring Manager,";
 
-  const contactHtml = buildCoverContact({ fullName, addressLine, cityStateZip, phone, email });
+  const contactHtml = buildCoverContact({
+    fullName,
+    addressLine,
+    cityStateZip,
+    phone,
+    email,
+  });
 
   const removeHomeLocationMentions = (html) => {
     if (COMPANY_LOCATION) return html;
-    const homeLoc = [strip(fd.city), strip(fd.state)].filter(Boolean).join(", ");
+    const homeLoc = [strip(fd.city), strip(fd.state)]
+      .filter(Boolean)
+      .join(", ");
     return homeLoc
-      ? html.replace(new RegExp(`\\s+in\\s+${homeLoc.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`, "gi"), "")
+      ? html.replace(
+          new RegExp(
+            `\\s+in\\s+${homeLoc.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`,
+            "gi"
+          ),
+          ""
+        )
       : html;
   };
-  const stripCoverTitle = (html) => String(html).replace(/<h[12][^>]*>[\s\S]*?<\/h[12]>/gi, "");
+  const stripCoverTitle = (html) =>
+    String(html).replace(/<h[12][^>]*>[\s\S]*?<\/h[12]>/gi, "");
 
   if (!openai) {
     const body = `
 <div class="cover">
   <p>${SALUTATION_TEXT}</p>
-  <p>I’m writing to express interest in ${role || "the role"}${company ? ` at ${company}` : ""}${
-      COMPANY_LOCATION ? ` in ${COMPANY_LOCATION}` : ""
-    }.</p>
+  <p>I’m writing to express interest in ${role || "the role"}${
+      company ? ` at ${company}` : ""
+    }${COMPANY_LOCATION ? ` in ${COMPANY_LOCATION}` : ""}.</p>
   <p>Thank you for your time and consideration.</p>
   <p>${SIGNOFF},<br/>${fullName}</p>
 </div>`.trim();
@@ -443,8 +574,12 @@ async function handleCover(data, res) {
       bodyHtml: cleaned,
     });
 
-    const exportHtml = templated ? templated : formatCoverHtmlPlain(contactHtml, cleaned);
-    const fullHtml = templated ? templated : formatCoverHtml(contactHtml, cleaned);
+    const exportHtml = templated
+      ? templated
+      : formatCoverHtmlPlain(contactHtml, cleaned);
+    const fullHtml = templated
+      ? templated
+      : formatCoverHtml(contactHtml, cleaned);
 
     return res.json({
       output: fullHtml,
@@ -484,14 +619,21 @@ async function handleCover(data, res) {
       bodyHtml,
     });
 
-    const exportHtml = templated ? templated : formatCoverHtmlPlain(contactHtml, bodyHtml);
-    const fullHtml = templated ? templated : formatCoverHtml(contactHtml, bodyHtml);
+    const exportHtml = templated
+      ? templated
+      : formatCoverHtmlPlain(contactHtml, bodyHtml);
+    const fullHtml = templated
+      ? templated
+      : formatCoverHtml(contactHtml, bodyHtml);
 
     const text = fullHtml.replace(/<[^>]+>/g, "");
 
     return res.json({ output: fullHtml, html: exportHtml, text, ats_score: 0 });
   } catch (err) {
-    console.error("OpenAI cover error:", err?.response?.data || err?.message || err);
+    console.error(
+      "OpenAI cover error:",
+      err?.response?.data || err?.message || err
+    );
     return res.status(500).json({ error: "AI generation failed" });
   }
 }
@@ -521,21 +663,36 @@ async function handleResume(data, res) {
     // Sections
     const summaryIn = strip(fd.summary) || strip(fd.experience);
     const jobDescription = strip(fd.job_description);
-    const skills = Array.isArray(fd.skills) ? fd.skills.map((s) => strip(s)).filter(Boolean) : [];
-    const certifications = Array.isArray(fd.certifications) ? fd.certifications.map((c) => strip(c)).filter(Boolean) : [];
-    const hobbies = Array.isArray(fd.hobbies) ? fd.hobbies.map((h) => strip(h)).filter(Boolean) : [];
+    const skills = Array.isArray(fd.skills)
+      ? fd.skills.map((s) => strip(s)).filter(Boolean)
+      : [];
+    const certifications = Array.isArray(fd.certifications)
+      ? fd.certifications.map((c) => strip(c)).filter(Boolean)
+      : [];
+    const hobbies = Array.isArray(fd.hobbies)
+      ? fd.hobbies.map((h) => strip(h)).filter(Boolean)
+      : [];
 
     const education = Array.isArray(fd.education)
       ? fd.education.filter((e) => e && Object.values(e).some((v) => strip(v)))
       : [];
     const experienceList = Array.isArray(fd.experienceList)
-      ? fd.experienceList.filter((e) => e && Object.values(e).some((v) => strip(v)))
+      ? fd.experienceList.filter(
+          (e) => e && Object.values(e).some((v) => strip(v))
+        )
       : [];
 
     // Sort newest first
-    const toYear = (v) => (Number.isFinite(parseInt(v, 10)) ? parseInt(v, 10) : 0);
-    education.sort((a, b) => toYear(b.graduationYear || b.gradYear) - toYear(a.graduationYear || a.gradYear));
-    experienceList.sort((a, b) => toYear(b.end || b.start) - toYear(a.end || a.start));
+    const toYear = (v) =>
+      Number.isFinite(parseInt(v, 10)) ? parseInt(v, 10) : 0;
+    education.sort(
+      (a, b) =>
+        toYear(b.graduationYear || b.gradYear) -
+        toYear(a.graduationYear || a.gradYear)
+    );
+    experienceList.sort(
+      (a, b) => toYear(b.end || b.start) - toYear(a.end || a.start)
+    );
 
     // ====== Build seed lines (Education) ======
     const eduLines = [];
@@ -543,12 +700,18 @@ async function handleResume(data, res) {
       let line = `${strip(e.degree) || ""} in ${strip(e.major) || ""}`.trim();
       if (e.school) line += ` — ${strip(e.school)}`;
       const gradMonth = strip(e.graduationMonth || e.gradMonth || e.month);
-      const gradYearRaw = strip(e.graduationYear || e.gradYear || e.year || e.y);
+      const gradYearRaw = strip(
+        e.graduationYear || e.gradYear || e.year || e.y
+      );
       const gradYear = normalizeYear4(gradYearRaw);
 
-      let gradStr = gradMonth && gradYear ? `${gradMonth}, ${gradYear}` : [gradMonth, gradYear].filter(Boolean).join(" ");
+      let gradStr =
+        gradMonth && gradYear
+          ? `${gradMonth}, ${gradYear}`
+          : [gradMonth, gradYear].filter(Boolean).join(" ");
       const nowYear = new Date().getFullYear();
-      if (gradYear && parseInt(gradYear, 10) >= nowYear) gradStr = `Anticipated Graduation: ${gradStr}`;
+      if (gradYear && parseInt(gradYear, 10) >= nowYear)
+        gradStr = `Anticipated Graduation: ${gradStr}`;
       if (gradStr) line += `, ${gradStr}`;
       eduLines.push(line);
     }
@@ -589,7 +752,9 @@ async function handleResume(data, res) {
       const e = expMeta[i];
       const header = expHeadersFormal[i] || expHeaders[i];
       const headerHtml = `<strong>${escHtml(header)}</strong>`;
-      const bulletsArr = Array.isArray(e.bullets) ? e.bullets.map((b) => strip(b)).filter(Boolean) : [];
+      const bulletsArr = Array.isArray(e.bullets)
+        ? e.bullets.map((b) => strip(b)).filter(Boolean)
+        : [];
       bulletsArr.forEach((b) => bulletList.push(b));
       expBlocks.push({ headerHtml, bullets: bulletsArr, raw: e });
     }
@@ -628,26 +793,57 @@ async function handleResume(data, res) {
     /* ------------------------------ FALLBACK ------------------------------ */
     if (!openai) {
       const parts = [];
-      if (summaryOut) parts.push("<strong>SUMMARY</strong>", `<p>${escHtml(summaryOut)}</p>`);
+      if (summaryOut)
+        parts.push("<strong>SUMMARY</strong>", `<p>${escHtml(summaryOut)}</p>`);
       if (eduLinesFormal.length)
-        parts.push("<strong>EDUCATION</strong>", "<ul>" + eduLinesFormal.map((l) => `<li>${escHtml(l)}</li>`).join("") + "</ul>");
+        parts.push(
+          "<strong>EDUCATION</strong>",
+          "<ul>" +
+            eduLinesFormal.map((l) => `<li>${escHtml(l)}</li>`).join("") +
+            "</ul>"
+        );
       if (expBlocks.length) {
         parts.push("<strong>WORK EXPERIENCE</strong>");
         for (const block of expBlocks) {
           parts.push(block.headerHtml);
           if (block.bullets.length)
-            parts.push("<ul>" + block.bullets.map((b) => `<li>${escHtml(b)}</li>`).join("") + "</ul>");
+            parts.push(
+              "<ul>" +
+                block.bullets.map((b) => `<li>${escHtml(b)}</li>`).join("") +
+                "</ul>"
+            );
         }
       }
       if (skillsFormal.length)
-        parts.push("<strong>SKILLS</strong>", "<ul>" + skillsFormal.map((s) => `<li>${escHtml(s)}</li>`).join("") + "</ul>");
+        parts.push(
+          "<strong>SKILLS</strong>",
+          "<ul>" +
+            skillsFormal.map((s) => `<li>${escHtml(s)}</li>`).join("") +
+            "</ul>"
+        );
       if (certsFormal.length)
-        parts.push("<strong>CERTIFICATIONS</strong>", "<ul>" + certsFormal.map((c) => `<li>${escHtml(c)}</li>`).join("") + "</ul>");
+        parts.push(
+          "<strong>CERTIFICATIONS</strong>",
+          "<ul>" +
+            certsFormal.map((c) => `<li>${escHtml(c)}</li>`).join("") +
+            "</ul>"
+        );
       if (hobbiesFormal.length)
-        parts.push("<strong>HOBBIES</strong>", "<ul>" + hobbiesFormal.map((h) => `<li>${escHtml(h)}</li>`).join("") + "</ul>");
+        parts.push(
+          "<strong>HOBBIES</strong>",
+          "<ul>" +
+            hobbiesFormal.map((h) => `<li>${escHtml(h)}</li>`).join("") +
+            "</ul>"
+        );
 
       const bodyHtml = parts.join("\n");
-      const contactHtml = buildResumeContact({ fullName, addressLine, cityStateZip, phone, email });
+      const contactHtml = buildResumeContact({
+        fullName,
+        addressLine,
+        cityStateZip,
+        phone,
+        email,
+      });
 
       const templated = renderResumeWithTemplate({
         fullName,
@@ -659,22 +855,33 @@ async function handleResume(data, res) {
         email,
         summary: summaryOut,
         sectionsHtml: {
-          educationList: eduLinesFormal.map((l) => `<li>${escHtml(l)}</li>`).join(""),
-          skillsList: skillsFormal.map((s) => `<li>${escHtml(s)}</li>`).join(""),
+          educationList: eduLinesFormal
+            .map((l) => `<li>${escHtml(l)}</li>`)
+            .join(""),
+          skillsList: skillsFormal
+            .map((s) => `<li>${escHtml(s)}</li>`)
+            .join(""),
           certsList: certsFormal.map((c) => `<li>${escHtml(c)}</li>`).join(""),
           experience: expBlocks
             .map(
               (b) =>
                 `<div style="margin:0 0 10px 0;">${b.headerHtml}${
-                  b.bullets.length ? `<ul>${b.bullets.map((x) => `<li>${escHtml(x)}</li>`).join("")}</ul>` : ""
+                  b.bullets.length
+                    ? `<ul>${b.bullets
+                        .map((x) => `<li>${escHtml(x)}</li>`)
+                        .join("")}</ul>`
+                    : ""
                 }</div>`
             )
             .join(""),
-          hobbiesList: hobbiesFormal.map((h) => `<li>${escHtml(h)}</li>`).join(""),
+          hobbiesList: hobbiesFormal
+            .map((h) => `<li>${escHtml(h)}</li>`)
+            .join(""),
         },
       });
 
-      const exportHtml = templated || formatResumeHtmlPlain(contactHtml, bodyHtml);
+      const exportHtml =
+        templated || formatResumeHtmlPlain(contactHtml, bodyHtml);
       const fullHtml = templated || formatResumeHtml(contactHtml, bodyHtml);
 
       const atsScore = calculateAtsScore(
@@ -702,7 +909,8 @@ async function handleResume(data, res) {
 
     // Decide mode
     const hasAnyBullets = expBlocks.some((b) => b.bullets.length > 0);
-    const shouldGenerate = mode === "generate" || (mode === "auto" && !hasAnyBullets && !summaryIn);
+    const shouldGenerate =
+      mode === "generate" || (mode === "auto" && !hasAnyBullets && !summaryIn);
 
     if (shouldGenerate) {
       // ------------------------ GENERATE MODE ------------------------
@@ -714,21 +922,27 @@ async function handleResume(data, res) {
       });
       const obj = parseResumeJson(r.choices?.[0]?.message?.content || "") || {};
 
-      const eduOutRaw = Array.isArray(obj.education) ? obj.education.map(String).filter(Boolean) : eduLinesFormal;
+      const eduOutRaw = Array.isArray(obj.education)
+        ? obj.education.map(String).filter(Boolean)
+        : eduLinesFormal;
       const eduOut = await safeFormalizeList(
         eduOutRaw,
         { user_city: fd.city, user_state: fd.state, type: "education" },
         openai
       );
 
-      const skillsOutRaw = Array.isArray(obj.skills) ? obj.skills.map(String).filter(Boolean) : skillsFormal;
+      const skillsOutRaw = Array.isArray(obj.skills)
+        ? obj.skills.map(String).filter(Boolean)
+        : skillsFormal;
       const skillsOut = await safeFormalizeList(
         skillsOutRaw,
         { user_city: fd.city, user_state: fd.state, type: "skills" },
         openai
       );
 
-      const certsOutRaw = Array.isArray(obj.certifications) ? obj.certifications.map(String).filter(Boolean) : certsFormal;
+      const certsOutRaw = Array.isArray(obj.certifications)
+        ? obj.certifications.map(String).filter(Boolean)
+        : certsFormal;
       const certsOut = await safeFormalizeList(
         certsOutRaw,
         { user_city: fd.city, user_state: fd.state, type: "certifications" },
@@ -736,7 +950,9 @@ async function handleResume(data, res) {
       );
 
       const expOutRaw = Array.isArray(obj.experience) ? obj.experience : [];
-      const expHeadersAi = expOutRaw.map((row) => String(row.header || "").trim());
+      const expHeadersAi = expOutRaw.map((row) =>
+        String(row.header || "").trim()
+      );
       const expHeadersAiFormal = await safeFormalizeList(
         expHeadersAi,
         { user_city: fd.city, user_state: fd.state, type: "experience" },
@@ -764,25 +980,41 @@ async function handleResume(data, res) {
         } catch {}
       }
       if (summaryGenOut) {
-        parts.push("<strong>SUMMARY</strong>", `<p>${escHtml(summaryGenOut)}</p>`);
+        parts.push(
+          "<strong>SUMMARY</strong>",
+          `<p>${escHtml(summaryGenOut)}</p>`
+        );
       }
 
       if (eduOut.length) {
-        parts.push("<strong>EDUCATION</strong>", "<ul>" + eduOut.map((l) => `<li>${escHtml(l)}</li>`).join("") + "</ul>");
+        parts.push(
+          "<strong>EDUCATION</strong>",
+          "<ul>" +
+            eduOut.map((l) => `<li>${escHtml(l)}</li>`).join("") +
+            "</ul>"
+        );
       }
 
       const expAtsBullets = [];
       if (expOutRaw.length) {
         parts.push("<strong>WORK EXPERIENCE</strong>");
         for (let i = 0; i < expOutRaw.length; i++) {
-          const header = escHtml(expHeadersAiFormal[i] || expHeadersAi[i] || "");
+          const header = escHtml(
+            expHeadersAiFormal[i] || expHeadersAi[i] || ""
+          );
           const bulletsArr = Array.isArray(expOutRaw[i].bullets)
-            ? expOutRaw[i].bullets.map((b) => String(b || "").trim()).filter(Boolean)
+            ? expOutRaw[i].bullets
+                .map((b) => String(b || "").trim())
+                .filter(Boolean)
             : [];
           if (header) parts.push(`<strong>${header}</strong>`);
           if (bulletsArr.length) {
             expAtsBullets.push(...bulletsArr);
-            parts.push("<ul>" + bulletsArr.map((b) => `<li>${escHtml(b)}</li>`).join("") + "</ul>");
+            parts.push(
+              "<ul>" +
+                bulletsArr.map((b) => `<li>${escHtml(b)}</li>`).join("") +
+                "</ul>"
+            );
           }
         }
       } else if (expBlocks.length) {
@@ -790,21 +1022,46 @@ async function handleResume(data, res) {
         for (const block of expBlocks) {
           parts.push(block.headerHtml);
           if (block.bullets.length)
-            parts.push("<ul>" + block.bullets.map((b) => `<li>${escHtml(b)}</li>`).join("") + "</ul>");
+            parts.push(
+              "<ul>" +
+                block.bullets.map((b) => `<li>${escHtml(b)}</li>`).join("") +
+                "</ul>"
+            );
         }
       }
 
       if (skillsOut.length)
-        parts.push("<strong>SKILLS</strong>", "<ul>" + skillsOut.map((s) => `<li>${escHtml(s)}</li>`).join("") + "</ul>");
+        parts.push(
+          "<strong>SKILLS</strong>",
+          "<ul>" +
+            skillsOut.map((s) => `<li>${escHtml(s)}</li>`).join("") +
+            "</ul>"
+        );
 
       if (certsOut.length)
-        parts.push("<strong>CERTIFICATIONS</strong>", "<ul>" + certsOut.map((c) => `<li>${escHtml(c)}</li>`).join("") + "</ul>");
+        parts.push(
+          "<strong>CERTIFICATIONS</strong>",
+          "<ul>" +
+            certsOut.map((c) => `<li>${escHtml(c)}</li>`).join("") +
+            "</ul>"
+        );
 
       if (hobbiesOut.length)
-        parts.push("<strong>HOBBIES</strong>", "<ul>" + hobbiesOut.map((h) => `<li>${escHtml(h)}</li>`).join("") + "</ul>");
+        parts.push(
+          "<strong>HOBBIES</strong>",
+          "<ul>" +
+            hobbiesOut.map((h) => `<li>${escHtml(h)}</li>`).join("") +
+            "</ul>"
+        );
 
       const bodyHtml = parts.join("\n");
-      const contactHtml = buildResumeContact({ fullName, addressLine, cityStateZip, phone, email });
+      const contactHtml = buildResumeContact({
+        fullName,
+        addressLine,
+        cityStateZip,
+        phone,
+        email,
+      });
 
       const templated = renderResumeWithTemplate({
         fullName,
@@ -816,18 +1073,28 @@ async function handleResume(data, res) {
         email,
         summary: summaryGenOut,
         sectionsHtml: {
-          educationList: (eduOut || []).map((l) => `<li>${escHtml(l)}</li>`).join(""),
-          skillsList: (skillsOut || []).map((s) => `<li>${escHtml(s)}</li>`).join(""),
-          certsList: (certsOut || []).map((c) => `<li>${escHtml(c)}</li>`).join(""),
+          educationList: (eduOut || [])
+            .map((l) => `<li>${escHtml(l)}</li>`)
+            .join(""),
+          skillsList: (skillsOut || [])
+            .map((s) => `<li>${escHtml(s)}</li>`)
+            .join(""),
+          certsList: (certsOut || [])
+            .map((c) => `<li>${escHtml(c)}</li>`)
+            .join(""),
           experience: expOutRaw.length
             ? expOutRaw
                 .map((row, idx) => {
-                  const header = escHtml(String(expHeadersAiFormal[idx] || "").trim());
+                  const header = escHtml(
+                    String(expHeadersAiFormal[idx] || "").trim()
+                  );
                   const blts = (row.bullets || [])
                     .map((b) => `<li>${escHtml(String(b || "").trim())}</li>`)
                     .join("");
                   return `<div style="margin:0 0 10px 0;">${
-                    header ? `<div style="font-weight:700; font-size:14px;">${header}</div>` : ""
+                    header
+                      ? `<div style="font-weight:700; font-size:14px;">${header}</div>`
+                      : ""
                   }${blts ? `<ul>${blts}</ul>` : ""}</div>`;
                 })
                 .join("")
@@ -835,15 +1102,22 @@ async function handleResume(data, res) {
                 .map(
                   (b) =>
                     `<div style="margin:0 0 10px 0;">${b.headerHtml}${
-                      b.bullets.length ? `<ul>${b.bullets.map((x) => `<li>${escHtml(x)}</li>`).join("")}</ul>` : ""
+                      b.bullets.length
+                        ? `<ul>${b.bullets
+                            .map((x) => `<li>${escHtml(x)}</li>`)
+                            .join("")}</ul>`
+                        : ""
                     }</div>`
                 )
                 .join(""),
-          hobbiesList: (hobbiesOut || []).map((h) => `<li>${escHtml(h)}</li>`).join(""),
+          hobbiesList: (hobbiesOut || [])
+            .map((h) => `<li>${escHtml(h)}</li>`)
+            .join(""),
         },
       });
 
-      const exportHtml = templated || formatResumeHtmlPlain(contactHtml, bodyHtml);
+      const exportHtml =
+        templated || formatResumeHtmlPlain(contactHtml, bodyHtml);
       const fullHtml = templated || formatResumeHtml(contactHtml, bodyHtml);
 
       const atsScore = calculateAtsScore(
@@ -852,7 +1126,8 @@ async function handleResume(data, res) {
           skills: !!(skillsOut && skillsOut.length),
           certifications: !!(certsOut && certsOut.length),
           education: !!(eduOut && eduOut.length),
-          experience: !!(expOutRaw && expOutRaw.length) || !!experienceList.length,
+          experience:
+            !!(expOutRaw && expOutRaw.length) || !!experienceList.length,
           summary: !!summaryGenOut,
           hobbies: !!(hobbiesOut && hobbiesOut.length),
         },
@@ -877,7 +1152,9 @@ async function handleResume(data, res) {
         messages: msgs,
         temperature: 0.2,
       });
-      const parsed = parseRewriteResponse(r.choices?.[0]?.message?.content || "");
+      const parsed = parseRewriteResponse(
+        r.choices?.[0]?.message?.content || ""
+      );
       if (parsed?.summary) summaryOutRewrite = String(parsed.summary);
       try {
         const arr = await safeFormalizeList(
@@ -903,9 +1180,11 @@ async function handleResume(data, res) {
         messages: msgs,
         temperature: 0.2,
       });
-      const parsed = parseRewriteResponse(r.choices?.[0]?.message?.content || "") || {};
+      const parsed =
+        parseRewriteResponse(r.choices?.[0]?.message?.content || "") || {};
       const outArr =
-        Array.isArray(parsed.bullets) && parsed.bullets.length === bulletsArr.length
+        Array.isArray(parsed.bullets) &&
+        parsed.bullets.length === bulletsArr.length
           ? parsed.bullets
           : bulletsArr;
 
@@ -913,7 +1192,9 @@ async function handleResume(data, res) {
         const orig = bulletsArr[i];
         const newText = String(cand || "");
         const allowed = new Set(numberTokens(orig).map(normalizeNum));
-        const cleaned = newText.replace(/\d[\d,]*\.?\d*(?:%|k|K|M|m)?/g, (m) => (allowed.has(normalizeNum(m)) ? m : ""));
+        const cleaned = newText.replace(/\d[\d,]*\.?\d*(?:%|k|K|M|m)?/g, (m) =>
+          allowed.has(normalizeNum(m)) ? m : ""
+        );
         return cleaned.trim() || orig;
       });
 
@@ -922,26 +1203,60 @@ async function handleResume(data, res) {
     }
 
     const parts = [];
-    if (summaryOutRewrite) parts.push("<strong>SUMMARY</strong>", `<p>${escHtml(summaryOutRewrite)}</p>`);
+    if (summaryOutRewrite)
+      parts.push(
+        "<strong>SUMMARY</strong>",
+        `<p>${escHtml(summaryOutRewrite)}</p>`
+      );
     if (eduLinesFormal.length)
-      parts.push("<strong>EDUCATION</strong>", "<ul>" + eduLinesFormal.map((l) => `<li>${escHtml(l)}</li>`).join("") + "</ul>");
+      parts.push(
+        "<strong>EDUCATION</strong>",
+        "<ul>" +
+          eduLinesFormal.map((l) => `<li>${escHtml(l)}</li>`).join("") +
+          "</ul>"
+      );
     if (expBlocksOut.length) {
       parts.push("<strong>WORK EXPERIENCE</strong>");
       for (const block of expBlocksOut) {
         parts.push(block.headerHtml);
         if (block.bullets.length)
-          parts.push("<ul>" + block.bullets.map((b) => `<li>${escHtml(b)}</li>`).join("") + "</ul>");
+          parts.push(
+            "<ul>" +
+              block.bullets.map((b) => `<li>${escHtml(b)}</li>`).join("") +
+              "</ul>"
+          );
       }
     }
     if (skillsFormal.length)
-      parts.push("<strong>SKILLS</strong>", "<ul>" + skillsFormal.map((s) => `<li>${escHtml(s)}</li>`).join("") + "</ul>");
+      parts.push(
+        "<strong>SKILLS</strong>",
+        "<ul>" +
+          skillsFormal.map((s) => `<li>${escHtml(s)}</li>`).join("") +
+          "</ul>"
+      );
     if (certsFormal.length)
-      parts.push("<strong>CERTIFICATIONS</strong>", "<ul>" + certsFormal.map((c) => `<li>${escHtml(c)}</li>`).join("") + "</ul>");
+      parts.push(
+        "<strong>CERTIFICATIONS</strong>",
+        "<ul>" +
+          certsFormal.map((c) => `<li>${escHtml(c)}</li>`).join("") +
+          "</ul>"
+      );
     if (hobbiesFormal.length)
-      parts.push("<strong>HOBBIES</strong>", "<ul>" + hobbiesFormal.map((h) => `<li>${escHtml(h)}</li>`).join("") + "</ul>");
+      parts.push(
+        "<strong>HOBBIES</strong>",
+        "<ul>" +
+          hobbiesFormal.map((h) => `<li>${escHtml(h)}</li>`).join("") +
+          "</ul>"
+      );
 
     const bodyHtml = parts.join("\n");
-    const contactHtml = buildResumeContact({ fullName, addressLine, cityStateZip, phone, email });
+    const contactHtml = buildResumeContact({
+      fullName,
+      addressLine,
+      cityStateZip,
+      phone,
+      email,
+    });
 
     const templated = renderResumeWithTemplate({
       fullName,
@@ -953,22 +1268,31 @@ async function handleResume(data, res) {
       email,
       summary: summaryOutRewrite,
       sectionsHtml: {
-        educationList: eduLinesFormal.map((l) => `<li>${escHtml(l)}</li>`).join(""),
+        educationList: eduLinesFormal
+          .map((l) => `<li>${escHtml(l)}</li>`)
+          .join(""),
         skillsList: skillsFormal.map((s) => `<li>${escHtml(s)}</li>`).join(""),
         certsList: certsFormal.map((c) => `<li>${escHtml(c)}</li>`).join(""),
         experience: expBlocksOut
           .map(
             (b) =>
               `<div style="margin:0 0 10px 0;">${b.headerHtml}${
-                b.bullets.length ? `<ul>${b.bullets.map((x) => `<li>${escHtml(x)}</li>`).join("")}</ul>` : ""
+                b.bullets.length
+                  ? `<ul>${b.bullets
+                      .map((x) => `<li>${escHtml(x)}</li>`)
+                      .join("")}</ul>`
+                  : ""
               }</div>`
           )
           .join(""),
-        hobbiesList: hobbiesFormal.map((h) => `<li>${escHtml(h)}</li>`).join(""),
+        hobbiesList: hobbiesFormal
+          .map((h) => `<li>${escHtml(h)}</li>`)
+          .join(""),
       },
     });
 
-    const exportHtml = templated || formatResumeHtmlPlain(contactHtml, bodyHtml);
+    const exportHtml =
+      templated || formatResumeHtmlPlain(contactHtml, bodyHtml);
     const fullHtml = templated || formatResumeHtml(contactHtml, bodyHtml);
 
     const atsScore = calculateAtsScore(
@@ -987,20 +1311,35 @@ async function handleResume(data, res) {
     return res.json({
       output: fullHtml,
       html: exportHtml,
-      plain_text: [summaryOutRewrite, ...(rewrittenBullets.length ? rewrittenBullets : bulletList)].join("\n").trim(),
+      plain_text: [
+        summaryOutRewrite,
+        ...(rewrittenBullets.length ? rewrittenBullets : bulletList),
+      ]
+        .join("\n")
+        .trim(),
       ats_score: atsScore,
       error: null,
     });
   } catch (err) {
     console.error("Resume error:", err);
-    return res.status(500).json({ output: "", error: "Resume generation failed" });
+    return res
+      .status(500)
+      .json({ output: "", error: "Resume generation failed" });
   }
 }
 
 /* --------------------------------- Start -------------------------------- */
+// const PORT = Number(process.env.PORT || 8000);
+// app.listen(PORT, "127.0.0.1", () => {
+//   console.log(`Backend running on http://127.0.0.1:${PORT}`);
+//   if (resumeTpl) console.log("Resume template: enabled");
+//   if (coverTpl) console.log("Cover template: enabled");
+// });
 const PORT = Number(process.env.PORT || 8000);
-app.listen(PORT, "127.0.0.1", () => {
-  console.log(`Backend running on http://127.0.0.1:${PORT}`);
+const HOST = process.env.HOST || "0.0.0.0"; // <-- important for Render
+
+app.listen(PORT, HOST, () => {
+  console.log(`Backend running on http://${HOST}:${PORT}`);
   if (resumeTpl) console.log("Resume template: enabled");
   if (coverTpl) console.log("Cover template: enabled");
 });
@@ -1027,25 +1366,32 @@ function renderResumeWithTemplate({
   const model = {
     fullName: escHtml(fullName || ""),
     address1: escHtml((addressLine || "").replace(/\s*,\s*$/g, "")),
-    city:    escHtml((city || "").replace(/\s*,\s*$/g, "")),
-    state:   escHtml((state || "").replace(/\s*,\s*$/g, "")),
-    zip:     escHtml((zip || "").replace(/\s*,\s*$/g, "")),
-    phone:   escHtml(phone || ""),
-    email:   escHtml(email || ""),
+    city: escHtml((city || "").replace(/\s*,\s*$/g, "")),
+    state: escHtml((state || "").replace(/\s*,\s*$/g, "")),
+    zip: escHtml((zip || "").replace(/\s*,\s*$/g, "")),
+    phone: escHtml(phone || ""),
+    email: escHtml(email || ""),
     summary: escHtml(summary || ""),
     // Section fragments (already HTML – do NOT escape)
     experienceBlocks: sectionsHtml.experience || "",
-    educationList:    sectionsHtml.educationList || "",
-    skillsList:       sectionsHtml.skillsList || "",
-    certsList:        sectionsHtml.certsList || "",
-    hobbiesList:      sectionsHtml.hobbiesList || "",
+    educationList: sectionsHtml.educationList || "",
+    skillsList: sectionsHtml.skillsList || "",
+    certsList: sectionsHtml.certsList || "",
+    hobbiesList: sectionsHtml.hobbiesList || "",
   };
 
   return renderPlaceholders(resumeTpl, model);
 }
 
 // ---- Template renderer for cover.html ----
-function renderCoverWithTemplate({ fullName, addressLine, cityStateZip, phone, email, bodyHtml }) {
+function renderCoverWithTemplate({
+  fullName,
+  addressLine,
+  cityStateZip,
+  phone,
+  email,
+  bodyHtml,
+}) {
   if (DEV && coverTpl && fs.existsSync(COVER_TEMPLATE_PATH)) {
     try {
       coverTpl = fs.readFileSync(COVER_TEMPLATE_PATH, "utf8");
