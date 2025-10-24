@@ -32,15 +32,20 @@ import {
 const app = express();
 
 /* --------------------------------- CORS ---------------------------------- */
-app.use(
-  cors({
-    origin: ["https://nurseresumepro.com"],
-    methods: ["GET", "POST", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
-);
-app.options("*", cors());
+const corsConfig = {
+  origin: [
+    "https://nurseresumepro.com",
+    "https://www.nurseresumepro.com",   // <- add www
+  ],
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+  optionsSuccessStatus: 200,            // <- avoid 204-without-headers issue
+};
+
+app.use(cors(corsConfig));
+app.options("*", cors(corsConfig));      // <- use same config for preflight
+// ---------------------------------------------------------
 
 /* ------------------------------- JSON body ------------------------------- */
 app.use(express.json({ limit: "1mb" }));
