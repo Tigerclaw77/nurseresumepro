@@ -59,7 +59,7 @@ function PreviewModal({
   // Dev bypass flag (only active in vite dev mode AND env says true)
   const DEV_BYPASS = import.meta.env.DEV && ENV.DEV_EXPORT_BYPASS === "true";
   const HAS_CHECKOUT_TOKEN = Boolean(sessionToken);
-  const CAN_EXPORT = paid || DEV_BYPASS || HAS_CHECKOUT_TOKEN;
+  const CAN_EXPORT = DEV_BYPASS || HAS_CHECKOUT_TOKEN;
 
   const normalized = useMemo(() => {
     if (!content) return { html: "", text: "" };
