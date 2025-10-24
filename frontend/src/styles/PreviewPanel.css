@@ -1,0 +1,208 @@
+.preview-container {
+  position: relative;
+  border: 1px solid #ccc;
+  padding: 1rem;
+  margin-top: 1rem;
+  background: white;
+}
+
+.preview-content {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 0.95rem;
+  white-space: pre-wrap;
+  background: white;
+  color: black;
+  padding: 1rem;
+  border-radius: 6px;
+  line-height: 1.6;
+}
+
+.preview-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.15);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.preview-overlay.visible {
+  pointer-events: auto;
+}
+
+/* .overlay-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #333;
+  color: #fff;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  text-align: center;
+  z-index: 3;
+  opacity: 1;
+  transition: opacity 1s ease;
+}
+
+.overlay-message.fade-out {
+  opacity: 0;
+} */
+
+.overlay-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #333;
+  color: #fff;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  z-index: 10;
+  opacity: 1;
+  transition: opacity 1s ease-in-out;
+}
+
+.overlay-message.fade-out {
+  animation: fadeOut 4s forwards;
+}
+
+.preview-container::after {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-size: 0.75rem;
+  color: #555;
+  z-index: 3;
+}
+
+.preview-content pre {
+  white-space: pre-wrap;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.resume-preview {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 1.5rem;
+  background: white;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #222;
+  max-width: 700px;
+  margin: 0 auto;
+  white-space: pre-wrap;
+}
+
+.resume {
+  font-family: Arial, sans-serif;
+  font-size: 12pt;
+  line-height: 1.5;
+  color: #333;
+}
+
+.resume .contact {
+  margin-bottom: 1rem;
+}
+
+.resume .contact strong {
+  font-size: 1.1em;
+  display: block;
+}
+
+.resume .body p {
+  margin-bottom: 0.75rem;
+}
+
+.resume hr {
+  border: none;
+  border-top: 1px solid #ccc;
+  margin: 1rem 0;
+}
+
+.ql-editor ul li:empty::before {
+  content: none !important;
+}
+
+.ql-editor > div {
+  margin: 0.4em 0 !important;
+  padding: 0 !important;
+  line-height: 1.35;
+}
+
+.ql-editor > div:empty {
+  display: none !important;
+}
+
+.ql-editor > ul {
+  margin: 0.5em 1.2em !important;
+  padding: 0 !important;
+}
+
+.ql-editor > ul > li {
+  margin: 0.2em 0 !important;
+  padding-left: 0.2em !important;
+}
+
+.ql-editor strong {
+  display: block;
+  font-size: 1.05em;
+  margin: 0.8em 0 0.3em 0;
+}
+
+.section-header {
+  margin-top: 1em;
+  font-weight: bold;
+}
+
+.rendered-output {
+  background: #ffffff;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  line-height: 1.6;
+  white-space: pre-line;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
+}
+
+.rendered-output-wrapper {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.overlay-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(51, 51, 51, 0.95);
+  color: #fff;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  text-align: center;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  75% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.form-check-input {
+  width: 1.25em;
+  height: 1.25em;
+  border: 2px solid #444;
+  background-color: #fff;
+  margin-top: 0.3em;
+}
+
+.form-check-input:checked {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}

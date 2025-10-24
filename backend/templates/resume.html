@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Resume - {{fullName}}</title>
+    <style>
+      /* ATS-safe: no tables, text boxes, or icons */
+      body {
+        font-family: Arial, sans-serif;
+        color: #000;
+        margin: 0;
+      }
+      .page {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 0 16px;
+      }
+
+      .header {
+        text-align: center;
+        margin: 0 0 16px 0;
+      }
+      .header h1 {
+        margin: 0 0 4px 0;
+        font-size: 22px;
+        font-weight: 700;
+      }
+      .header p {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.4;
+      }
+
+      .rule {
+        border: 0;
+        border-top: 1px solid #ccc;
+        margin: 16px 0;
+      }
+
+      h2 {
+        font-size: 16px;
+        margin: 0 0 6px 0;
+        font-weight: 700;
+      }
+      .section {
+        margin-bottom: 16px;
+      }
+
+      ul {
+        margin: 0 0 8px 20px;
+        padding: 0;
+        font-size: 14px;
+      }
+      li {
+        margin: 0 0 4px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <!-- HEADER (centered) -->
+      <div class="header">
+        <h1>{{fullName}}</h1>
+        <p>{{address1}}</p>
+        <p>{{city}}, {{state}} {{zip}}</p>
+        <p>{{phone}}</p>
+        <p>{{email}}</p>
+      </div>
+
+      <hr class="rule" />
+
+      <!-- SUMMARY (optional) -->
+      {{#if summary}}
+      <section class="section">
+        <h2>PROFESSIONAL SUMMARY</h2>
+        <p style="margin: 0; font-size: 14px; line-height: 1.5">{{summary}}</p>
+      </section>
+      {{/if}}
+
+      <!-- EDUCATION -->
+      {{#if educationList}}
+      <section class="section">
+        <h2>EDUCATION</h2>
+        <ul>
+          {{educationList}}
+        </ul>
+      </section>
+      {{/if}}
+
+      <!-- EXPERIENCE -->
+      {{#if experienceBlocks}}
+      <section class="section">
+        <h2>EXPERIENCE</h2>
+        {{experienceBlocks}}
+      </section>
+      {{/if}}
+
+      <!-- SKILLS -->
+      {{#if skillsList}}
+      <section class="section">
+        <h2>SKILLS</h2>
+        <ul>
+          {{skillsList}}
+        </ul>
+      </section>
+      {{/if}}
+
+      <!-- CERTIFICATIONS -->
+      {{#if certsList}}
+      <section class="section">
+        <h2>CERTIFICATIONS</h2>
+        <ul>
+          {{certsList}}
+        </ul>
+      </section>
+      {{/if}}
+
+      <!-- HOBBIES -->
+      {{#if hobbiesList}}
+      <section class="section">
+        <h2>HOBBIES</h2>
+        <ul>
+          {{hobbiesList}}
+        </ul>
+      </section>
+      {{/if}}
+    </div>
+  </body>
+</html>

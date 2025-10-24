@@ -1,0 +1,12 @@
+.site-footer {
+  text-align: center;
+  padding: 1rem;
+  background-color: #f5f5f5;
+  font-size: 0.9rem;
+}
+
+.footer-links a {
+  margin: 0 0.5rem;
+  color: #333;
+  text-decoration: underline;
+}

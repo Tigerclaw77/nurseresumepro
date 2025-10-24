@@ -1,0 +1,370 @@
+.user-info-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.name-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.name-group label {
+  font-weight: bold;
+  margin-bottom: 0rem;
+}
+
+.name-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.suffix-input,
+.first-name-input,
+.last-name-input {
+  width: 100%;
+  max-width: unset;
+}
+
+select.suffix-input {
+  all: unset;
+  appearance: auto;
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid #888;
+  border-radius: 4px;
+  width: 120px;
+  background-color: #eee;
+  color: #333;
+  line-height: 1.4;
+  height: 42px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+select.suffix-input:hover,
+select.suffix-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 0rem;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  text-align: left;
+  box-sizing: border-box;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.form-group label {
+  font-weight: bold;
+  margin-bottom: 0.4rem;
+  white-space: normal;
+  word-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+input::placeholder,
+textarea::placeholder {
+  font-style: italic;
+  color: #888;
+}
+
+textarea::placeholder {
+  font-family: "Arial", sans-serif;
+}
+
+input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: 1rem;
+  margin-bottom: 0.4rem;
+}
+
+.name-label-row {
+  display: none;
+}
+
+.name-label-left,
+.credentials-label-right {
+  display: none;
+}
+
+.mobile-only {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.contact-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.sidebar {
+  display: none;
+}
+
+/* ===== NEW for City / State / ZIP layout (Mobile-First) ===== */
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.city-field input {
+  width: 100%;
+}
+
+.right-fields {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.state-field input {
+  width: 80px;
+}
+
+.zip-field input {
+  width: 100px;
+}
+
+.form-group.short-field input[name="state"] {
+  width: 60px;
+}
+
+.form-group.short-field input[name="zip"] {
+  width: 80px;
+}
+
+/* Opt-in card design */
+.opt-in-card {
+  background: #f9f9ff;
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 1.5rem;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 100%;
+}
+
+/* Opt-in card title */
+.opt-in-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Description text */
+.opt-in-description {
+  margin: 0;
+  font-size: 1rem;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* Actions section: checkbox and button */
+.opt-in-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+/* Checkbox and label styling */
+.opt-in-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  color: #333;
+}
+
+/* Adjust the checkbox size */
+.opt-in-label input[type="checkbox"] {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.opt-in-card .opt-in-row {
+  display: flex;
+  flex-direction: column; /* Stack elements vertically */
+  align-items: center; /* Center elements horizontally */
+  gap: 1rem; /* Add space between checkbox and button */
+}
+
+.opt-in-row button {
+  max-width: 220px; /* Prevent the button from expanding too wide */
+  width: 100%;
+  margin-top: 1rem; /* Add space between checkbox and button */
+}
+
+/* Button styling */
+.share-button {
+  width: 10%;
+  background-color: #0b74de;
+  color: white;
+  padding: 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1.125rem;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.3s ease;
+  font-family: "YourButtonFontFamily", sans-serif;
+}
+
+.share-button:hover {
+  background-color: #095ab2;
+}
+
+input,
+select,
+textarea {
+  padding: 0.3rem 0.5rem !important;
+  font-size: 0.9rem !important;
+}
+
+/* ================ Desktop / Tablet Overrides ================ */
+@media (min-width: 768px) {
+  .name-row {
+    flex-direction: row;
+    gap: 1rem;
+  }
+
+  .first-name-input,
+  .last-name-input {
+    width: 32%;
+    text-align: left;
+  }
+
+  select.suffix-input {
+    width: 80px !important;
+    height: 32px !important;
+  }
+
+  .form-row {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .city-field {
+    flex-grow: 1;
+    min-width: 160px;
+  }
+
+  .right-fields {
+    gap: 0.75rem;
+    align-items: flex-end;
+  }
+
+  .state-field,
+  .zip-field {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .form-group input,
+  .form-group select {
+    width: 100%;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .mobile-only {
+    display: none;
+  }
+
+  .name-label-row {
+    display: flex;
+    justify-content: flex-start;
+    gap: 1rem;
+    margin-bottom: 0rem;
+  }
+
+  .credentials-label-right {
+    margin-left: calc(200px + 190px + 1rem);
+  }
+
+  .name-label-left,
+  .credentials-label-right {
+    display: block;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+
+  .credentials-input {
+    width: 130px !important;
+  }
+
+  .contact-layout {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .contact-form {
+    flex: 2;
+  }
+
+  .sidebar {
+    display: block;
+    flex: 1;
+    padding-left: 2rem;
+  }
+
+  .opt-in-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .opt-in-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    font-size: 1rem;
+  }
+
+  .share-button {
+    width: auto;
+    padding: 0.6rem 1.5rem;
+  }
+}

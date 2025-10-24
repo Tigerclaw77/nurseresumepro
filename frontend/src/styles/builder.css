@@ -1,0 +1,380 @@
+/* =========================================
+   Resume Builder — scoped page styles
+   Wrap the page in: <div class="resume-builder">
+   ========================================= */
+
+.resume-builder,
+.resume-builder * { box-sizing: border-box; }
+
+/* ---------- Tokens (2025-friendly) ---------- */
+.resume-builder{
+  --rail-w: 320px;           /* right rail width */
+  --gutter: 28px;            /* column gap */
+  --form-min: 760px;         /* min form width */
+
+  --bp-rail-collapse: 1360px;/* collapse rail before clipping on 1440p */
+  --bp-phone: 768px;         /* phone / tablet portrait */
+
+  --c-card: #fff;
+  --c-border: #e5e7eb;
+  --c-text: #0f172a;
+  --c-muted: #475569;
+  --c-tab: #f1f5f9;
+  --c-tab-hover: #e2e8f0;
+  --c-brand: #0b6cff;
+  --c-brand-600: #0755c7;
+  --c-brand-700: #0649a2;
+}
+
+/* If this page sits inside a Bootstrap container, uncap it here (page only) */
+.resume-builder.container,
+.resume-builder.container-lg,
+.resume-builder.container-xl,
+.resume-builder.container-xxl { max-width: 100% !important; }
+
+/* Optional inner max for readability */
+.resume-builder .content-max{
+  max-width: 1380px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* ---------- Background (light, professional) ---------- */
+.resume-builder{
+  background:
+    radial-gradient(circle at 40% 20%, rgba(255,255,255,0.08), transparent 60%),
+    linear-gradient(135deg, #e9efff 0%, #f4f7ff 50%, #dee7ff 100%);
+  min-height: 100vh;
+  background-attachment: fixed;
+  background-size: cover;
+  background-repeat: no-repeat;
+  position: relative;
+  overflow-x: hidden;
+}
+.resume-builder::before{
+  content:"";
+  position:absolute; inset:0;
+  background: radial-gradient(circle at center, transparent 60%, rgba(0,0,0,0.05) 100%);
+  pointer-events:none;
+}
+
+/* ---------- Page title ---------- */
+.resume-builder .page-title{
+  font-size: 2.25rem;
+  font-weight: 700;
+  text-align: center;
+  color: #1e293b;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.25rem;
+}
+.resume-builder .page-title::after{
+  content:"";
+  display:block;
+  width:72px; height:3px;
+  margin:.5rem auto 0;
+  background: linear-gradient(90deg, #007bff, #4f46e5);
+  border-radius:9999px;
+}
+
+/* ---------- Card shell (glass with Safari prefix + fallbacks) ---------- */
+.resume-builder .tabs-container{
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.08),
+    0 12px 30px rgba(0,0,0,0.05);
+
+  -webkit-backdrop-filter: blur(10px) saturate(1.3);
+  backdrop-filter: blur(10px) saturate(1.3);
+}
+
+/* Stronger glass only when supported */
+@supports ((-webkit-backdrop-filter: blur(0)) or (backdrop-filter: blur(0))){
+  .resume-builder .tabs-container{
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+  }
+}
+/* Clean opaque fallback if not supported */
+@supports not ((-webkit-backdrop-filter: blur(0)) or (backdrop-filter: blur(0))){
+  .resume-builder .tabs-container{
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+}
+/* A11y: less transparency */
+@media (prefers-reduced-transparency: reduce){
+  .resume-builder .tabs-container{
+    -webkit-backdrop-filter:none!important;
+    backdrop-filter:none!important;
+    background:#fff!important;
+  }
+}
+
+/* ---------- Tabs ---------- */
+.resume-builder .tab-buttons{ width:100%; margin-bottom: 1rem; }
+
+.resume-builder .tab-group{
+  display:flex;
+  flex-direction:column;
+  gap:.5rem;
+  border-bottom:2px solid #ddd;
+}
+.resume-builder .tab{
+  flex:1;
+  padding:.75rem 1rem;
+  font-size:1.1rem;
+  font-weight:600;
+  color:#334155;
+  background:var(--c-tab);
+  border:0;
+  border-bottom:3px solid transparent;
+  text-align:center;
+  border-radius:8px;
+  cursor:pointer;
+  transition: background .15s ease, color .15s ease, box-shadow .15s ease;
+}
+.resume-builder .tab:not(.active):hover{ background:var(--c-tab-hover); color:var(--c-brand); }
+.resume-builder .tab:focus-visible{ outline:2px solid var(--c-brand-600); outline-offset:2px; }
+.resume-builder .tab.active{
+  background:#fff;
+  color:var(--c-brand);
+  border-bottom:4px solid var(--c-brand);
+  box-shadow:0 -2px 6px rgba(0,0,0,.06);
+}
+@media (min-width:768px){
+  .resume-builder .tab-group{
+    flex-direction:row;
+    justify-content:center;
+    gap:0;
+    border-bottom:none;
+    max-width:420px;
+    margin:0 auto;
+  }
+  .resume-builder .tab{ border-radius:8px 8px 0 0; }
+}
+
+/* ---------- Page grid: form | right rail ---------- */
+.resume-builder .tabs-shell{
+  display:grid;
+  grid-template-columns: minmax(var(--form-min), 1fr) var(--rail-w);
+  gap: var(--gutter);
+  align-items:start;
+}
+@media (max-width: 1360px){
+  .resume-builder .tabs-shell{ grid-template-columns: 1fr; }
+}
+
+/* Right-rail safety */
+.resume-builder .aside-ads,
+.resume-builder .aside-ads .ad-frame,
+.resume-builder .aside-ads iframe,
+.resume-builder .aside-ads img{
+  max-width:100%;
+  width:100%;
+  height:auto;
+  display:block;
+}
+
+/* ---------- Form rhythm & helpers ---------- */
+.resume-builder .form-group > label,
+.resume-builder .section-heading{
+  display:block;
+  margin:10px 0 6px;
+  font-weight:600;
+  line-height:1.25;
+}
+.resume-builder .form-group textarea{ margin-bottom:1.25rem; }
+.resume-builder input,
+.resume-builder select,
+.resume-builder textarea{ min-width:0; width:100%; }
+.resume-builder .form-group input[name="address"]{ margin-bottom:8px; } /* Address1 → Address2 gap */
+
+/* ---------- Name block (4 cols): First | Last | Suffix | Credentials ---------- */
+.resume-builder .name-grid{
+  display:grid;
+  grid-template-columns: 1fr 1fr 130px 1fr;
+  column-gap:12px;
+  row-gap:4px;
+  align-items:end;
+  margin:0 0 8px 0;
+  padding:0;
+}
+.resume-builder .name-grid .label-left{
+  grid-column:1 / 3;
+  margin:0 0 4px;
+  font-weight:600;
+}
+.resume-builder .name-grid .label-right{
+  grid-column:4;
+  margin:0 0 4px;
+  font-weight:600;
+  justify-self:start;
+}
+
+/* Typical two/three-up rows (opt-in via classes) */
+.resume-builder .contact-form .form-row{ display:grid; gap:12px; }
+@media (min-width: 769px){
+  .resume-builder .contact-form .form-row.cols-2{ grid-template-columns: 1fr 1fr; }
+  .resume-builder .contact-form .form-row.cols-3{ grid-template-columns: 1fr 120px 140px; }
+}
+
+/* ---------- Consent / Checkboxes (fix alignment + responsiveness) ---------- */
+/* Container around your ConsentBlock */
+.resume-builder .consent-block{
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--c-border);
+}
+
+/* Two consent options side-by-side on desktop, stack on mobile */
+.resume-builder .consent-grid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 24px;
+  margin-bottom: 8px;
+}
+@media (max-width: 768px){
+  .resume-builder .consent-grid{ grid-template-columns: 1fr; }
+}
+
+/* A single consent item: checkbox + label text */
+.resume-builder .consent-item{
+  display:flex;
+  align-items:flex-start;      /* keep label aligned to top of multiple lines */
+  gap:10px;
+}
+
+/* Make the checkbox a touch larger and brand-colored */
+.resume-builder .consent-item input[type="checkbox"]{
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;             /* optical balance next to text */
+  accent-color: var(--c-brand);/* modern browsers */
+  cursor: pointer;
+}
+
+/* Label text next to the box */
+.resume-builder .consent-item label{
+  margin: 0;                   /* kill default margins */
+  line-height: 1.35;
+  color: var(--c-text);
+  cursor: pointer;             /* clicking text toggles the box if 'for' is set */
+}
+
+/* Terms line style */
+.resume-builder .terms-line{
+  color: var(--c-text);
+  font-size: 1.05rem;
+  line-height: 1.45;
+}
+.resume-builder .terms-line a{
+  color: var(--c-brand);
+  text-decoration: none;
+}
+.resume-builder .terms-line a:hover{
+  text-decoration: underline;
+}
+
+/* Give a little breathing room above the primary button */
+.resume-builder .actions .btn,
+.resume-builder .actions .btn-primary{
+  margin-top: 6px;
+}
+
+/* ---------- Phones / tablet portrait adjustments ---------- */
+@media (max-width: 768px){
+  .resume-builder .tabs-container{ padding:.75rem; }
+  .resume-builder .tab-buttons{ margin-bottom:.75rem; }
+
+  .resume-builder .name-grid{
+    grid-template-columns: 1fr;
+    column-gap:0; row-gap:6px;
+  }
+  .resume-builder .name-grid .label-left,
+  .resume-builder .name-grid .label-right{
+    grid-column:1; margin:0 0 4px;
+  }
+
+  .resume-builder .contact-form .form-row{
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+}
+
+/* overall page width + responsive side padding */
+.content-max {
+  /* keep a nice cap but allow full width */
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: clamp(8px, 2.5vw, 24px);
+}
+
+/* 2-column shell: main + ad rail */
+.tabs-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px; /* main flexes; ad rail fixed */
+  gap: 24px;
+  align-items: start;
+}
+
+/* ad rail behavior */
+.aside-ads {
+  position: sticky;
+  top: 16px;
+  max-width: 100%;
+  overflow: visible; /* don't clip */
+}
+
+/* tighten ad rail a bit as screen narrows */
+@media (max-width: 1280px) {
+  .tabs-shell {
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 16px;
+  }
+}
+
+/* stack on single column for smaller screens so nothing clips */
+@media (max-width: 1100px) {
+  .tabs-shell {
+    grid-template-columns: 1fr;
+  }
+  .aside-ads {
+    position: static; /* no sticky when stacked */
+    margin-top: 16px;
+  }
+}
+
+/* e.g., in global.css */
+.linklike{
+  background:none;border:none;color:#0b5;cursor:pointer;text-decoration:underline;font:inherit;padding:0
+}
+.linklike:hover{ text-decoration:none }
+
+/* outer shell padding and max width */
+.tabs-shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 12px 16px; /* keeps content off the edges */
+}
+
+/* left pane card feel (if not already styled) */
+.tabs-container {
+  padding: 12px;
+  border-radius: 12px;
+}
+
+/* right rail spacing */
+.aside-ads {
+  display: grid;
+  gap: 16px;
+}
+
+/* optional: pin the right rail a bit so it doesn't jam the edge */
+@media (min-width: 1100px) {
+  .tabs-shell {
+    column-gap: 24px; /* if you're using CSS grid on the shell */
+  }
+}

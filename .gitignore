@@ -1,0 +1,26 @@
+# node + builds
+**/node_modules/
+**/dist/
+**/build/
+**/dist-ssr/
+**/.vite/
+**/.next/
+**/.parcel-cache/
+
+# logs
+**/*.log
+logs/
+
+# env (ignore everywhere, but allow example templates anywhere)
+**/.env*
+!**/.env.example
+!**/.env.sample
+
+# editors
+**/.DS_Store
+**/.idea/
+**/.vscode/
+!.vscode/extensions.json
+
+# hosting/platform
+**/.vercel/

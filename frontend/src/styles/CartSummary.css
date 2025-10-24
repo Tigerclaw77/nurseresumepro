@@ -1,0 +1,26 @@
+.cart-summary {
+  padding: 0.5rem;
+}
+
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.cart-item-label {
+  font-size: 0.9rem;
+}
+
+.remove-btn {
+  background: #eee;
+  border: 1px solid #ccc;
+  padding: 0.2rem 0.5rem;
+  cursor: pointer;
+}
+
+.cart-total {
+  margin-top: 0.5rem;
+  font-weight: bold;
+}

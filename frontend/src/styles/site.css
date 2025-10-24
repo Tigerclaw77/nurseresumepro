@@ -1,0 +1,379 @@
+/* =======================
+   Vars & base layout
+   ======================= */
+:root{
+  --container-max: 1180px;
+  --container-pad: 24px;
+
+  --text: #1a1f2a;
+  --muted: #4b5563;
+
+  /* surfaces */
+  --panel-bg: #ffffff;
+  --panel-border: #e6edf5;
+  --panel-shadow: 0 10px 28px rgba(15,23,42,.06);
+
+  /* footer (dark navy) */
+  --footer-bg: #0d1327;
+  --footer-border: rgba(255,255,255,.08);
+  --footer-text: #e8edf6;
+  --footer-muted: #a8b2c3;
+}
+
+html, body, #root { height: 100%; margin: 0; }
+
+/* prevent intermediate wrappers from painting over the page bg */
+html, body, #root,
+.site, .site-main,
+.page-hero, .page-content,
+.resume-builder, .shell, .main-pane,
+.tabs-shell, .aside-ads {
+  background: transparent !important;
+}
+
+/* =======================
+   Global page background
+   ======================= */
+html { background-color: #f7fbff; } /* never a gap */
+
+body::before{
+  content:"";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, #f7fbff 0%, #eef4ff 45%, #e9f1fb 100%),
+    radial-gradient(900px 420px at 85% 0, rgba(88,161,255,.14), transparent 60%),
+    radial-gradient(720px 340px at 15% 0, rgba(52,211,153,.10), transparent 60%);
+  background-repeat: no-repeat;
+  background-position: top center, top right, top left;
+  background-size: 100% 100%, 900px 420px, 720px 340px;
+}
+@supports (-webkit-touch-callout:none){
+  body::before { will-change: transform; } /* iOS stability */
+}
+
+/* =======================
+   Typography
+   ======================= */
+body{
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+               "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  overflow-x: hidden;
+}
+
+/* =======================
+   Header
+   ======================= */
+.site-header{ position: static; }
+.site-header-inner{
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 18px var(--container-pad);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Brand / logo — light gradient with crisp rim */
+.brand{
+  font-weight: 900;
+  letter-spacing: .2px;
+  font-size: 60px;
+  line-height: 1;
+  background: linear-gradient(90deg,#6bd1ff 0%,#88ffa5 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+  -webkit-text-stroke: .5px rgba(0,0,0,.18);
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.15))
+          drop-shadow(0 4px 10px rgba(0,0,0,.05));
+  margin-left: 20px;
+}
+
+/* =======================
+   Hero
+   ======================= */
+.page-hero,
+.hero{
+  max-width: var(--container-max);
+  padding: 0 var(--container-pad);
+}
+
+.page-hero:not(.hero--center),
+.hero:not(.hero--center){
+  margin: 2px auto auto 20px;
+  text-align: left;
+}
+
+.hero--center{
+  text-align: center;
+  margin: 2px auto;
+}
+
+.hero--center .hero-bullets{
+  display: inline-block;
+  text-align: left;
+  margin: 0 auto 1.5rem;
+}
+
+.hero-heading {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  color: #111827; /* dark slate for strong contrast */
+}
+
+/* Bulleted points */
+.hero-bullets {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem 0;
+}
+
+.hero-bullets li {
+  position: relative;
+  margin-bottom: 0.5rem;
+  padding-left: 1.75rem;
+  font-size: 1.1rem;
+  color: #374151; /* softer gray-blue for readability */
+  line-height: 1.5;
+}
+
+.hero-bullets li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #3b82f6; /* soft medical blue checkmark */
+  font-weight: bold;
+}
+
+.hero-bullets li{ opacity:0; transform:translateY(4px); animation:heroFade .5s ease-out forwards; }
+.hero-bullets li:nth-child(2){ animation-delay:.08s; }
+.hero-bullets li:nth-child(3){ animation-delay:.16s; }
+@keyframes heroFade{ to{ opacity:1; transform:none; } }
+
+
+/* Responsive adjustments for hero */
+@media (max-width: 640px){
+  .hero-heading{ font-size: 1.6rem; }
+  .hero-bullets li{ font-size: 1rem; }
+}
+
+/* =======================
+   Content wrapper
+   ======================= */
+.page-content{
+  max-width: var(--container-max);
+  margin: 24px auto 28px;
+  padding: 0 var(--container-pad);
+}
+
+/* =======================
+   Tabs container (your color)
+   ======================= */
+.tabs-container{
+  background: #46729f;                 /* <-- your chosen background */
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  box-shadow: var(--panel-shadow);
+  padding: 12px;
+}
+
+/* Right rail */
+.aside-ads{
+  position: sticky;
+  top: 16px;
+  align-self: start;
+}
+
+/* =======================
+   Tabs (connected look)
+   ======================= */
+.tab-buttons{ margin-bottom: 0; padding: 8px 8px 0; }
+.tab-group{ display: flex; gap: 8px; }
+
+/* Both tabs are “cards” sitting on the white panel */
+.tab-group .tab{
+  appearance: none;
+  background: #fff;
+  color: #374151;
+  border: 1px solid var(--panel-border);
+  border-bottom: none;                 /* connects to panel */
+  padding: 14px 28px;
+  font-weight: 700;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  box-shadow: 0 2px 10px rgba(15,23,42,.04);
+  position: relative;
+  margin-bottom: -1px;                 /* removes the seam */
+  cursor: pointer;
+  transition: color .15s, box-shadow .15s, background .15s;
+}
+.tab-group .tab:not(.active){ background: #fafafa; }
+.tab-group .tab:hover,
+.tab-group .tab:focus-visible{
+  box-shadow: 0 4px 16px rgba(15,23,42,.08);
+  outline: none;
+}
+.tab-group .tab.active{
+  color: #0b68ff;
+  background: #fff;
+  z-index: 2;
+}
+.tab-group .tab.active::after{
+  content:"";
+  position: absolute;
+  left: 12px; right: 12px; bottom: -1px;
+  height: 3px; border-radius: 3px;
+  background: #0b68ff;
+}
+
+/* =======================
+   Panel (white form area)
+   ======================= */
+.tabs-container .tab-content{
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;                 /* rounded everywhere */
+  box-shadow: var(--panel-shadow);
+  padding: 22px 16px 16px;             /* extra top so “Name *” isn't tight */
+}
+
+/* If your markup places the panel directly under .tab-buttons,
+   these help ensure the “connected” look with the tabs above */
+.tab-buttons + .tab-content{
+  margin-top: 0;
+}
+
+/* Shared for any other cards/panels you render */
+.form-panel, .form-card, .panel, .card{
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  box-shadow: var(--panel-shadow);
+}
+
+/* =======================
+   Footer — dark navy
+   ======================= */
+.site-footer{
+  background: var(--footer-bg);
+  border-top: 1px solid var(--footer-border);
+  margin-top: 40px;
+}
+.footer-inner{
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 22px var(--container-pad);
+  display: grid; gap: 12px;
+}
+.footer-brand .brand{
+  font-size: 20px;
+  background: linear-gradient(90deg,#6bd1ff 0%,#88ffa5 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.footer-brand .tagline{ margin: 6px 0 0; color: var(--footer-muted); font-size: 14px; }
+.footer-nav{ display: flex; gap: 18px; flex-wrap: wrap; }
+.footer-link{ color: #bcd7ff; text-decoration: none; }
+.footer-link:hover{ color: #6bd1ff; text-decoration: underline; }
+.footer-copy{ color: var(--footer-text); opacity: .85; font-size: 13px; }
+
+.site-footer.is-centered .footer-inner{
+  justify-items: center;
+  text-align: center;
+}
+.site-footer.is-centered .footer-nav{
+  justify-content: center;
+}
+.site-footer.is-centered .footer-brand .tagline,
+.site-footer.is-centered .footer-copy{
+  text-align: center;
+}
+
+
+/* =======================
+   Small screens
+   ======================= */
+@media (max-width: 768px){
+  .aside-ads{ position: static; }          /* no sticky on small devices */
+  .tabs-container .tab-content{ padding: 16px; }
+}
+
+/* =======================
+   Form layout refinements
+   ======================= */
+
+/* 1) Stop top-margin collapse inside the panel */
+.tabs-container .tab-content {
+  padding-top: 22px;     /* you already have this — keep it */
+  overflow: hidden;      /* <-- this prevents the first child's margin from collapsing */
+}
+
+/* 2) Normalize label spacing */
+.tabs-container .tab-content label {
+  display: block;
+  margin: 0 0 6px;       /* consistent bottom gap, no top margin by default */
+  line-height: 1.15;
+  font-weight: 600;
+}
+
+/* 3) If your markup uses a row wrapper, keep rows top-aligned */
+.tabs-container .tab-content .form-row,
+.tabs-container .tab-content .grid-row {
+  display: grid;
+  gap: 12px 16px;
+  align-items: start;    /* top-align columns/fields */
+}
+
+/* 4) (Optional) If you prefer a tiny top cushion on *all* labels, add it uniformly */
+.tabs-container .tab-content label { padding-top: 2px; }  /* small, equal nudge */
+
+/* --- Name / Credentials row: 4-column grid --- */
+.name-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr 220px 1.2fr; /* tweak widths to taste */
+  column-gap: 16px;
+  row-gap: 12px;
+  align-items: end;  /* lines label baselines */
+}
+
+/* Labels live in row 1 */
+.name-grid > .label-left{
+  grid-column: 1 / span 2;  /* spans first + last name columns */
+  grid-row: 1;
+  margin: 0 0 6px;
+  line-height: 1.15;
+}
+.name-grid > .label-right{
+  grid-column: 3 / span 2;  /* spans suffix + credentials columns */
+  grid-row: 1;
+  margin: 0 0 6px;
+  line-height: 1.15;
+}
+
+/* Controls live in row 2 */
+.name-grid [name="firstName"]     { grid-column: 1; grid-row: 2; }
+.name-grid [name="lastName"]      { grid-column: 2; grid-row: 2; }
+.name-grid select[name="suffix"],
+.name-grid [name="suffix"]        { grid-column: 3; grid-row: 2; }
+.name-grid [name="credentials"],
+.name-grid [name="credential"],
+.name-grid [placeholder*="RN"]    { grid-column: 4; grid-row: 2; }
+
+/* Small screens: collapse gracefully */
+@media (max-width: 720px){
+  .name-grid{
+    grid-template-columns: 1fr;  /* single column */
+  }
+  .name-grid > .label-left,
+  .name-grid > .label-right{ grid-column: 1; }
+  .name-grid [name="firstName"],
+  .name-grid [name="lastName"],
+  .name-grid [name="suffix"],
+  .name-grid [name="credentials"],
+  .name-grid [name="credential"]{ grid-column: 1; }
+}

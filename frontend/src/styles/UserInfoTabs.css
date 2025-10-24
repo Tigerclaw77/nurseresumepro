@@ -1,0 +1,169 @@
+/* ==================== PAGE SCOPE ==================== */
+/* Put this class on the outer wrapper of the builder page.
+   It lets us override Bootstrap container limits without touching the rest of the site. */
+.resume-builder-page { width: 100%; }
+
+/* Kill Bootstrap's container max-width cap for this page so the grid can breathe */
+.resume-builder-page.container,
+.resume-builder-page.container-lg,
+.resume-builder-page.container-xl,
+.resume-builder-page.container-xxl {
+  max-width: 100% !important;
+}
+
+/* Optional: if your wrapper isn't a .container, you can still keep a nice readable max */
+.resume-builder-page .content-max {
+  max-width: 1380px;             /* tweak to taste */
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* ==================== CARD / TABS (yours, mostly unchanged) ==================== */
+.tabs-container {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 1rem;
+  background-color: #fff;
+}
+
+.tab-buttons { width: 100%; margin-bottom: 1rem; }
+
+.tab-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-bottom: 2px solid #ddd;
+}
+
+.tab {
+  flex: 1;
+  padding: 0.75rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  background-color: #f9f9f9;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+.tab.active {
+  background-color: #fff;
+  color: #007bff;
+  border-bottom: 4px solid #007bff;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}
+.tab:focus { outline: 2px solid #0056b3; }
+.tab:not(.active):hover { background-color: #eaeaea; color: #007bff; }
+
+@media (min-width: 768px) {
+  .tab-group {
+    flex-direction: row;
+    justify-content: center;
+    gap: 0;
+    border-bottom: none;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+  .tab { border-radius: 6px 6px 0 0; }
+  .tab.active { border-bottom: 4px solid #007bff; }
+}
+
+.short-input { max-width: 150px !important; }
+.form-group textarea { margin-bottom: 1.25rem; }
+
+/* ==================== GRID: FORM + RAIL ==================== */
+/* This grid should be on the wrapper that contains the form column and the right ad column */
+.tabs-shell{
+  display: grid;
+  grid-template-columns: minmax(760px, 1fr) 300px; /* comfy form + 300 rail */
+  gap: 24px;
+  align-items: start;
+}
+
+/* Industry norm for a 300px rail: collapse *before* any clipping.
+   With Bootstrap's 1140px container out of the way, 1280–1320px is safe. */
+@media (max-width: 1320px){
+  .tabs-shell{ grid-template-columns: 1fr; }
+}
+
+/* Make ad boxes flexible within their 300px rail (avoid overflow) */
+.aside-ads, .aside-ads .ad-frame, .aside-ads iframe, .aside-ads img {
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ==================== NAME ROW (no hacks, tight label) ==================== */
+/* Structure: a 4-col grid: First | Last | Suffix | Credentials */
+.name-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr 130px 1fr;
+  column-gap: 12px;
+  row-gap: 4px;
+  align-items: end;     /* all controls share a baseline */
+  margin-top: 0;        /* ensure there's no phantom top gap */
+  padding-top: 0;       /* defensive against inherited padding */
+  margin-bottom: 8px;   /* space before next row */
+}
+.name-grid input,
+.name-grid select{ width: 100%; min-width: 0; }
+
+/* Labels directly above their columns with *zero* top margin so they aren't "too high" */
+.name-grid .label-left{
+  grid-column: 1 / 3;   /* spans First + Last */
+  margin: 0 0 4px;      /* <-- zero top margin fixes the perceived height */
+  font-weight: 600;
+  line-height: 1.2;
+}
+.name-grid .label-right{
+  grid-column: 4;       /* above Credentials input */
+  margin: 0 0 4px;
+  font-weight: 600;
+  line-height: 1.2;
+  justify-self: start;
+}
+
+/* Global label rhythm everywhere else (kept reasonable) */
+.form-group > label,
+.section-heading{
+  display: block;
+  margin: 10px 0 6px;
+  font-weight: 600;
+}
+
+/* Address 1 -> Address 2 small gap */
+.form-group input[name="address"] { margin-bottom: 8px; }
+
+/* Phones/tablets: stack rows to single column */
+@media (max-width: 720px){
+  .name-grid{
+    grid-template-columns: 1fr !important;
+    column-gap: 0 !important;
+    row-gap: 6px !important;
+  }
+  .name-grid .label-left,
+  .name-grid .label-right{
+    grid-column: 1 !important;
+    margin: 0 0 4px !important;
+  }
+
+  /* Any two-up rows elsewhere */
+  .contact-form .form-row{
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  /* If you have a .right-fields wrapper for State/ZIP, stack those too */
+  .right-fields{
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  .tabs-container{ padding: 0.75rem; }
+  .tab-buttons{ margin-bottom: 0.75rem; }
+}

@@ -1,0 +1,20 @@
+.policy-container {
+  max-width: 700px;
+  margin: 2rem auto;
+  padding: 2rem;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.policy-container h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.policy-container h2 {
+  font-size: 1.3rem;
+  margin-top: 1.5rem;
+}

@@ -1,0 +1,61 @@
+/* .ats-score {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.ats-bar {
+  background: #eaeaea;
+  border-radius: 4px;
+  overflow: hidden;
+  width: 100%;
+  max-width: 400px;
+  height: 28px;
+  margin-top: 8px;
+}
+
+.ats-fill {
+  color: #fff;
+  padding-left: 8px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  transition: width 0.5s ease;
+}
+
+ */
+
+ .ats-score-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 1rem auto;
+  padding: 1rem;
+  border: 1px dashed #ccc;
+  border-radius: 8px;
+  max-width: 300px;
+  background: #f9f9f9;
+}
+
+.ats-label {
+  font-size: 0.9rem;
+  color: #666;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.ats-score-number {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+  letter-spacing: 1px;
+}
+
+.ats-help-message {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: #c0392b;
+  text-align: center;
+}

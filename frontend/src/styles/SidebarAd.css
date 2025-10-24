@@ -1,0 +1,63 @@
+.dummy-ad {
+  background: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 1rem;
+  width: 100%;
+  min-height: 300px; /* or taller like 400px if you want a "skyscraper" */
+  box-sizing: border-box;
+  text-align: center;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+
+.adsense-wrapper {
+  position: relative;
+}
+
+.ad-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 0.65rem;
+  color: #777;
+  background: white;
+  padding: 2px 4px;
+  z-index: 2;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  pointer-events: none;
+}
+
+.dummy-ad img {
+  width: 100%;
+  border-radius: 4px;
+  margin-bottom: 0.75rem;
+}
+
+.ad-text {
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.ad-button {
+  background-color: #0077cc;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.ad-button:hover {
+  background-color: #005fa3;
+}
+
+.sidebar-ad-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
