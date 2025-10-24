@@ -5,21 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <!-- Primary SEO -->
-    <title>NurseResumePro — AI-powered resumes & cover letters for nurses</title>
+    <title>
+      NurseResumePro — AI-powered resumes & cover letters for nurses
+    </title>
     <meta
       name="description"
       content="Create ATS-friendly resumes and cover letters in minutes — built for nurses and healthcare professionals."
     />
     <meta name="robots" content="index,follow" />
+    <link rel="canonical" href="https://nurseresumepro.com/" />
+    <!-- Browser UI color -->
     <meta name="theme-color" content="#0b68ff" />
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: dark)"
+      content="#0b3a88"
+    />
+
+    <!-- (Optional) iOS / Windows polish -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="msapplication-TileColor" content="#0b68ff" />
 
     <!-- Open Graph -->
-    <meta property="og:title" content="NurseResumePro — AI resumes for nurses" />
+    <meta
+      property="og:title"
+      content="NurseResumePro — AI resumes for nurses"
+    />
     <meta
       property="og:description"
       content="ATS-friendly resumes and cover letters for healthcare professionals."
     />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://nurseresumepro.com/" />
+    <meta property="og:image" content="/og-image.png" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="NurseResumePro — AI resumes for nurses"
+    />
+    <meta
+      name="twitter:description"
+      content="ATS-friendly resumes and cover letters for healthcare professionals."
+    />
+    <meta name="twitter:image" content="/og-image.png" />
 
     <!-- Icons -->
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -27,26 +61,80 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
     <!-- Preconnects for AdSense -->
-    <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin />
-    <link rel="preconnect" href="https://googleads.g.doubleclick.net" crossorigin />
-    <link rel="preconnect" href="https://tpc.googlesyndication.com" crossorigin />
+    <link
+      rel="preconnect"
+      href="https://pagead2.googlesyndication.com"
+      crossorigin
+    />
+    <link
+      rel="preconnect"
+      href="https://googleads.g.doubleclick.net"
+      crossorigin
+    />
+    <link
+      rel="preconnect"
+      href="https://tpc.googlesyndication.com"
+      crossorigin
+    />
 
-    <!-- Global AdSense init (reads env var in build) -->
+    <!-- Global AdSense init -->
     <script
       async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
-      data-ad-client="%VITE_ADSENSE_CLIENT%"
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5351497863299627"
       crossorigin="anonymous"
     ></script>
-    <meta name="google-adsense-account" content="%VITE_ADSENSE_CLIENT%" />
+    <meta name="google-adsense-account" content="ca-pub-5351497863299627" />
+
+    <!-- Structured data (Organization + WebSite) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "NurseResumePro",
+        "url": "https://nurseresumepro.com/",
+        "logo": "https://nurseresumepro.com/apple-touch-icon.png",
+        "sameAs": []
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "url": "https://nurseresumepro.com/",
+        "name": "NurseResumePro",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://nurseresumepro.com/?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
   </head>
 
   <body>
-    <noscript>
-      <strong>NurseResumePro</strong> works best with JavaScript enabled.
-    </noscript>
-
     <div id="root"></div>
+
+    <!-- Static fallback for bots / JS-disabled users -->
+    <noscript>
+      <h1>NurseResumePro</h1>
+      <p>
+        NurseResumePro helps nurses and other healthcare professionals build
+        ATS-optimized resumes and cover letters in minutes. Export polished
+        documents, tailor content to each job, and improve pass-through on
+        hospital and clinic ATS systems.
+      </p>
+      <ul>
+        <li>✅ AI-assisted resume & cover letter builder</li>
+        <li>✅ Designed for healthcare roles (RN, LPN, NP, CNA, etc.)</li>
+        <li>✅ ATS-friendly formatting and keywords</li>
+        <li>✅ Privacy-first: simple consent controls</li>
+      </ul>
+      <p>
+        Questions? See our <a href="/privacy">Privacy Policy</a> and
+        <a href="/terms">Terms</a>, or contact us at
+        <a href="mailto:nurseresumepro@gmail.com">nurseresumepro@gmail.com</a>.
+      </p>
+    </noscript>
 
     <script type="module" src="/src/main.jsx"></script>
   </body>
