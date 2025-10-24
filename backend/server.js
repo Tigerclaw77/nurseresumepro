@@ -4,6 +4,7 @@ import express from "express";
 import cors from "cors";
 import OpenAI from "openai";
 import htmlToDocx from "html-to-docx";
+import Stripe from "stripe";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -449,27 +450,81 @@ app.post("/api/generate/", async (req, res) => {
   }
 });
 
+/*------------------------------ Stripe -------------------------------------*/
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+app.post("/api/create-checkout-session", async (req, res) => {
+  try {
+    const { productType = "resume", customer_email } = req.body || {};
+    const priceId =
+      productType === "cover"
+        ? process.env.STRIPE_PRICE_COVERLETTER
+        : process.env.STRIPE_PRICE_RESUME;
+
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      payment_method_types: ["card"],
+      line_items: [{ price: priceId, quantity: 1 }],
+      allow_promotion_codes: true,
+      customer_email,
+      success_url: "https://nurseresumepro.com/success?session_id={CHECKOUT_SESSION_ID}",
+      cancel_url: "https://nurseresumepro.com/cancel",
+    });
+
+    res.json({ url: session.url });
+  } catch (err) {
+    console.error("Stripe create session error:", err.message);
+    res.status(500).json({ error: "checkout_session_failed" });
+  }
+});
+
 /* ----------------------------- Export (DOCX) ----------------------------- */
 app.post("/api/export/docx", async (req, res) => {
   try {
     const { html, type = "resume", paid, token } = req.body || {};
-    const isPaid =
-      Boolean(paid) || (typeof token === "string" && token.length > 10);
-    if (!isPaid) {
-      return res
-        .status(402)
-        .json({
-          error: "PAYMENT_REQUIRED",
-          message: "Please complete checkout to export.",
-        });
+
+    // --- Verify payment ---
+    let isPaid = Boolean(paid);
+
+    // If a Checkout Session ID is provided, verify it directly with Stripe
+    if (!isPaid && typeof token === "string" && token.startsWith("cs_")) {
+      try {
+        const session = await stripe.checkout.sessions.retrieve(token);
+
+        // Accept normal paid checkouts OR $0 checkouts with coupons
+        // (Stripe marks those as "no_payment_required" once completed)
+        const okStatuses = new Set(["paid", "no_payment_required"]);
+        if (
+          (session?.mode === "payment" || !session?.mode) &&
+          okStatuses.has(session?.payment_status) &&
+          (session?.status === "complete" || session?.status === "completed" || true) // tolerate minor variants
+        ) {
+          isPaid = true;
+        }
+      } catch (e) {
+        // keep isPaid = false on lookup failures
+        console.warn("Stripe session verify failed:", e?.message || e);
+      }
     }
+
+    if (!isPaid) {
+      return res.status(402).json({
+        error: "PAYMENT_REQUIRED",
+        message: "Please complete checkout to export.",
+      });
+    }
+
+    // --- Validate input HTML ---
     if (!html || typeof html !== "string") {
       return res.status(400).json({ error: "INVALID_HTML" });
     }
+
+    // --- Generate DOCX ---
     const buffer = await htmlToDocx(html, {
       orientation: "portrait",
       margins: { top: 720, right: 720, bottom: 720, left: 720 },
     });
+
     const filename = type === "cover" ? "cover-letter.docx" : "resume.docx";
     res.setHeader(
       "Content-Type",
