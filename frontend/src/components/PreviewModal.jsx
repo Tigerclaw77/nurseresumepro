@@ -9,9 +9,9 @@ import "../styles/PreviewModal.css";
 // Vite envs
 const ENV = {
   API_BASE_URL: (import.meta.env.VITE_API_BASE_URL || "").trim(),
-  // publishable key not strictly required because we redirect to session.url
-  STRIPE_PUBLISHABLE_KEY: (import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "").trim(),
-  DEV_EXPORT_BYPASS: (import.meta.env.VITE_DEV_EXPORT_BYPASS || "false").trim().toLowerCase(),
+  DEV_EXPORT_BYPASS: (import.meta.env.VITE_DEV_EXPORT_BYPASS || "false")
+    .trim()
+    .toLowerCase(),
   PRICE_USD: Number(import.meta.env.VITE_PUBLIC_PRICE_USD || 10), // $10 default
 };
 
@@ -19,11 +19,17 @@ function assertApiBase() {
   const base = ENV.API_BASE_URL;
   if (!base) throw new Error("Missing VITE_API_BASE_URL in .env");
   let u;
-  try { u = new URL(base); } catch {
-    throw new Error(`VITE_API_BASE_URL must be absolute (e.g. "https://api.example.com"). Current: "${base}"`);
+  try {
+    u = new URL(base);
+  } catch {
+    throw new Error(
+      `VITE_API_BASE_URL must be absolute (e.g. "https://api.example.com"). Current: "${base}"`
+    );
   }
   if (u.pathname && u.pathname !== "/") {
-    throw new Error(`VITE_API_BASE_URL must be origin-only. Use "${u.origin}" not "${base}"`);
+    throw new Error(
+      `VITE_API_BASE_URL must be origin-only. Use "${u.origin}" not "${base}"`
+    );
   }
   return u.origin;
 }
@@ -33,7 +39,9 @@ function getSessionIdFromUrl() {
     const params = new URLSearchParams(window.location.search);
     const id = params.get("session_id");
     return id && id.startsWith("cs_") ? id : "";
-  } catch { return ""; }
+  } catch {
+    return "";
+  }
 }
 
 function PreviewModal({
@@ -41,7 +49,7 @@ function PreviewModal({
   onClose,
   content,
   type,
-  paid = false,                 // external gate (legacy)
+  paid = false, // legacy flag (ignored unless DEV bypass)
   initialEmail = "",
   formData = {},
   selectedSignoff = "Sincerely",
@@ -51,7 +59,9 @@ function PreviewModal({
   const [error, setError] = useState("");
   const [isExporting, setIsExporting] = useState(false);
   const [sendEmail, setSendEmail] = useState(true);
-  const [email, setEmail] = useState(() => initialEmail || localStorage.getItem("email") || "");
+  const [email, setEmail] = useState(
+    () => initialEmail || localStorage.getItem("email") || ""
+  );
   const [sessionToken, setSessionToken] = useState(""); // cs_... from success redirect
   const isResume = type === "resume";
   const { add: addItem } = useCart();
@@ -59,6 +69,7 @@ function PreviewModal({
   // Dev bypass flag (only active in vite dev mode AND env says true)
   const DEV_BYPASS = import.meta.env.DEV && ENV.DEV_EXPORT_BYPASS === "true";
   const HAS_CHECKOUT_TOKEN = Boolean(sessionToken);
+  // Only allow export after real Stripe success OR dev bypass
   const CAN_EXPORT = DEV_BYPASS || HAS_CHECKOUT_TOKEN;
 
   const normalized = useMemo(() => {
@@ -67,12 +78,16 @@ function PreviewModal({
       return { html: content, text: content.replace(/<[^>]+>/g, "") };
     }
     const html = content.html || content.text || "";
-    const text = content.text || (typeof html === "string" ? html.replace(/<[^>]+>/g, "") : "");
+    const text =
+      content.text ||
+      (typeof html === "string" ? html.replace(/<[^>]+>/g, "") : "");
     return { html: html || "", text: text || "" };
   }, [content]);
 
   // read session_id from URL if present (after Stripe success redirect)
-  useEffect(() => { setSessionToken(getSessionIdFromUrl()); }, []);
+  useEffect(() => {
+    setSessionToken(getSessionIdFromUrl());
+  }, []);
 
   useEffect(() => {
     const cleaned = (normalized.html || "").trim();
@@ -82,14 +97,26 @@ function PreviewModal({
       const plain = (normalized.text || "").trim();
       const sections = ["education", "experience", "skills", "summary"];
       const verbs = [
-        "led","managed","created","resolved","trained",
-        "developed","designed","optimized","improved",
-        "launched","achieved","analyzed",
+        "led",
+        "managed",
+        "created",
+        "resolved",
+        "trained",
+        "developed",
+        "designed",
+        "optimized",
+        "improved",
+        "launched",
+        "achieved",
+        "analyzed",
       ];
       const bullets = plain.match(/(?:\u2022|–|\n-\s|\n\*)/g) || [];
-      const verbHits = plain.match(new RegExp(`\\b(${verbs.join("|")})\\b`, "gi")) || [];
+      const verbHits =
+        plain.match(new RegExp(`\\b(${verbs.join("|")})\\b`, "gi")) || [];
       let score = bullets.length * 3 + verbHits.length * 2;
-      sections.forEach((s) => { if (plain.toLowerCase().includes(s)) score += 10; });
+      sections.forEach((s) => {
+        if (plain.toLowerCase().includes(s)) score += 10;
+      });
       setAtsScore(Math.max(0, Math.min(score, 100)));
     } else {
       setAtsScore(null);
@@ -103,18 +130,26 @@ function PreviewModal({
   }, [sendEmail, email]);
 
   const buildExportPayload = () => {
-    const fullName = `${formData.firstName || ""} ${formData.lastName || ""}`.trim();
+    const fullName = `${formData.firstName || ""} ${
+      formData.lastName || ""
+    }`.trim();
     let htmlToExport = normalized.html || localContent || "";
 
     // Ensure cover letters export with a wrapper + contact block + signoff
     if (type === "cover" && !/class=["']cover["']/.test(htmlToExport)) {
       const contactBlock = `
         ${(formData.firstName || "") + " " + (formData.lastName || "")}<br/>
-        ${formData.address || ""}${formData.address2 ? ", " + formData.address2 : ""}<br/>
-        ${(formData.city || "")}${formData.state || formData.zip ? ", " : ""}${formData.state || ""} ${formData.zip || ""}<br/>
-        ${formData.email ? `Email: ${formData.email}<br/>` : "" }
-        ${formData.phone ? `Phone: ${formData.phone}` : "" }
-      `.replace(/\n\s+/g, "\n").trim();
+        ${formData.address || ""}${
+        formData.address2 ? ", " + formData.address2 : ""
+      }<br/>
+        ${formData.city || ""}${formData.state || formData.zip ? ", " : ""}${
+        formData.state || ""
+      } ${formData.zip || ""}<br/>
+        ${formData.email ? `Email: ${formData.email}<br/>` : ""}
+        ${formData.phone ? `Phone: ${formData.phone}` : ""}
+      `
+        .replace(/\n\s+/g, "\n")
+        .trim();
 
       let cleanBody = (normalized.html || localContent || "")
         .replace(/<\/?div[^>]*>/g, "")
@@ -141,8 +176,8 @@ function PreviewModal({
       type,
       signoff: selectedSignoff,
       fullName,
-      paid: DEV_BYPASS || paid,             // legacy flag
-      token: sessionToken || undefined,      // prefer verified session_id
+      paid: DEV_BYPASS || paid, // legacy flag (server will prefer token)
+      token: sessionToken || undefined, // prefer verified session_id
     };
   };
 
@@ -151,16 +186,20 @@ function PreviewModal({
     setError("");
     try {
       const base = assertApiBase();
-      const r = await fetch(new URL("/api/create-checkout-session", base).toString(), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          productType,
-          customer_email: (emailForReceipt || "").trim() || undefined,
-        }),
-      });
+      const r = await fetch(
+        new URL("/api/create-checkout-session", base).toString(),
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            productType,
+            customer_email: (emailForReceipt || "").trim() || undefined,
+          }),
+        }
+      );
       const data = await r.json();
-      if (!r.ok || !data?.url) throw new Error(data?.error || "Failed to start checkout");
+      if (!r.ok || !data?.url)
+        throw new Error(data?.error || "Failed to start checkout");
       window.location.href = data.url; // Stripe-hosted page
     } catch (e) {
       setError(e?.message || "Unable to start checkout.");
@@ -197,7 +236,12 @@ function PreviewModal({
       }
 
       const blob = await res.blob();
-      const filenameBase = type === "resume" ? "resume" : type === "cover" ? "cover_letter" : "document";
+      const filenameBase =
+        type === "resume"
+          ? "resume"
+          : type === "cover"
+          ? "cover_letter"
+          : "document";
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
       link.download = `${filenameBase}.docx`;
@@ -219,7 +263,12 @@ function PreviewModal({
         }
       }
 
-      addItem({ type, content: normalized.text || "", format: "word", timestamp: Date.now() });
+      addItem({
+        type,
+        content: normalized.text || "",
+        format: "word",
+        timestamp: Date.now(),
+      });
       onClose();
     } catch (err) {
       console.error(err);
@@ -229,17 +278,21 @@ function PreviewModal({
     }
   };
 
-  const priceLabel = `$${ENV.PRICE_USD.toFixed(2)}`;
-
   return (
     <Modal show={show} onHide={onClose} size="lg" centered backdrop="static">
       <Modal.Header closeButton>
-        <Modal.Title>{isResume ? "Resume Preview" : "Cover Letter Preview"}</Modal.Title>
+        <Modal.Title>
+          {isResume ? "Resume Preview" : "Cover Letter Preview"}
+        </Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
         {isResume && atsScore !== null && (
-          <ATSScore atsScore={atsScore} showTips={false} setShowTips={() => {}} />
+          <ATSScore
+            atsScore={atsScore}
+            showTips={false}
+            setShowTips={() => {}}
+          />
         )}
 
         <div
@@ -259,51 +312,60 @@ function PreviewModal({
 
       <Modal.Footer>
         <div className="me-auto" style={{ maxWidth: 340 }}>
-          {(CAN_EXPORT) && (
-            <>
-              <Form.Check
-                type="checkbox"
-                label="Send to my email"
-                checked={sendEmail}
-                onChange={() => setSendEmail((v) => !v)}
+          {/* Always show the email UI */}
+          <>
+            <Form.Check
+              type="checkbox"
+              label="Send to my email"
+              checked={sendEmail}
+              onChange={() => setSendEmail((v) => !v)}
+            />
+            {sendEmail && (
+              <Form.Control
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="mt-2"
+                autoComplete="email"
+                inputMode="email"
+                disabled={!CAN_EXPORT} // optional: lock until paid
               />
-              {sendEmail && (
-                <Form.Control
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="mt-2"
-                  autoComplete="email"
-                  inputMode="email"
-                />
-              )}
-            </>
-          )}
-          {!CAN_EXPORT && (
-            <div className="small text-muted">
-              You’ll be redirected to a secure Stripe checkout. Price: <strong>{priceLabel}</strong>.
-            </div>
-          )}
+            )}
+            {!CAN_EXPORT && (
+              <div className="small text-muted mt-2">
+                You can set your email now. We’ll send the file after checkout
+                completes.
+              </div>
+            )}
+          </>
         </div>
 
         <div className="d-flex flex-wrap justify-content-end">
           <Button variant="secondary" onClick={onClose} className="me-2">
             Cancel
           </Button>
-
-          {/* If we already have payment or a session token -> export. Otherwise -> start checkout */}
+          {!CAN_EXPORT && (
+            <div className="small text-muted me-3">
+              You’ll be redirected to Stripe. Price:{" "}
+              <strong>${ENV.PRICE_USD.toFixed(2)}</strong>.
+            </div>
+          )}
           <Button
             variant="primary"
             onClick={handleExport}
             disabled={isExporting}
-            title={CAN_EXPORT ? "Download Word File" : `Buy & Export — ${priceLabel}`}
+            title={
+              CAN_EXPORT
+                ? "Download Word File"
+                : `Buy & Export — $${ENV.PRICE_USD.toFixed(2)}`
+            }
           >
             {isExporting
               ? "Working..."
               : CAN_EXPORT
               ? "Download Word File"
-              : `Buy & Export — ${priceLabel}`}
+              : `Buy & Export — $${ENV.PRICE_USD.toFixed(2)}`}
           </Button>
         </div>
       </Modal.Footer>
